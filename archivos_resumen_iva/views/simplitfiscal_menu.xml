@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- ========== MENÚ PRINCIPAL DE LA APLICACIÓN ========== -->
+        
+        <!-- Aplicación raíz - Aparece en el menú principal con icono -->
+        <menuitem id="menu_simplitfiscal_root"
+                  name="Simplit Fiscal"
+                  web_icon="l10n_ve_simplit_fiscal,static/description/icon.png"
+                  sequence="60"/>
+        
+        <!-- ========== SUBMENÚS ========== -->
+        
+        <!-- Configuración -->
+        <menuitem id="menu_simplitfiscal_config"
+                  name="Configuración"
+                  parent="menu_simplitfiscal_root"
+                  action="action_simplitfiscal_config"
+                  sequence="10"/>
+        
+        <!-- ========== MENÚ EN CONTABILIDAD ========== -->
+        
+        <!-- Menú principal: Retenciones de IVA -->
+        <menuitem id="menu_retenciones_iva"
+                  name="Retenciones de IVA"
+                  parent="account.menu_finance_payables"
+                  sequence="14"/>
+        
+        <!-- Submenú: Unificador de Retenciones -->
+        <menuitem id="menu_unificador_retenciones"
+                  name="Unificador de Retenciones"
+                  parent="menu_retenciones_iva"
+                  action="action_wh_iva_unifier"
+                  sequence="1"/>
+        
+        <!-- Submenú: Comprobantes de Retención -->
+        <menuitem id="menu_account_wh_iva_summary"
+                  name="Comprobantes de Retención"
+                  parent="menu_retenciones_iva"
+                  action="action_account_wh_iva_summary_grouped"
+                  sequence="2"/>
+
+        <!-- Menú principal: Retenciones de ISLR -->
+        <menuitem id="menu_retenciones_islr"
+                  name="Retenciones de ISLR"
+                  parent="account.menu_finance_payables"
+                  sequence="15"/>
+        
+        <!-- Submenú: Unificador de Retenciones -->
+        <menuitem id="menu_unificador_retenciones_islr"
+                  name="Unificador de Retenciones"
+                  parent="menu_retenciones_islr"
+                  action="action_wh_islr_unifier"
+                  sequence="1"/>
+        
+        <!-- Submenú: Comprobantes de Retención -->
+        <menuitem id="menu_account_wh_islr_summary"
+                  name="Comprobantes de Retención"
+                  parent="menu_retenciones_islr"
+                  action="action_account_wh_islr_summary_grouped"
+                  sequence="2"/>
+
+        <!-- ========== SECCIÓN DE RESUMEN EN INFORMES ========== -->
+        
+        <menuitem id="menu_account_resumen_root"
+                  name="Resumen"
+                  parent="account.menu_finance_reports"
+                  sequence="50"/>
+
+        <menuitem id="menu_resumen_iva_report"
+                  name="Resumen de IVA"
+                  parent="menu_account_resumen_root"
+                  action="action_account_iva_resumen_wizard"
+                  sequence="10"/>
+
+        <!-- ========== LIBROS DE VENTAS EN CONTABILIDAD ========== -->
+        
+        <menuitem id="menu_account_sales_ledgers_root"
+                  name="Libros de ventas"
+                  parent="account.menu_finance_reports"
+                  sequence="51"/>
+
+        <menuitem id="menu_account_igtf_general_report"
+                  name="Reporte igtf general"
+                  parent="menu_account_sales_ledgers_root"
+                  action="action_account_igtf_report_wizard"
+                  sequence="10"/>
+
+        <menuitem id="menu_account_iva_sales_ledger"
+                  name="Libro de Ventas Detallado IGTF"
+                  parent="menu_account_sales_ledgers_root"
+                  action="action_account_iva_sales_ledger_wizard"
+                  sequence="20"/>
+
+        <menuitem id="menu_account_iva_sales_ledger_detailed"
+                  name="Libro de Ventas Detallado"
+                  parent="menu_account_sales_ledgers_root"
+                  action="action_account_iva_sales_ledger_detailed_wizard"
+                  sequence="30"/>
+        
+    </data>
+</odoo>

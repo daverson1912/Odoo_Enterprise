@@ -1,0 +1,3 @@
+cd C:\Users\Admin_2\Desktop\Odoo_Enterprise\V18-ENTERPRICE
+.\venv\Scripts\activate
+python -m odoo -c odoo.conf

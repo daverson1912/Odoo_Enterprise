@@ -1,0 +1,198 @@
+<t t-name="l10n_ve_simplit_fiscal.report_wh_islr">
+    <t t-call="web.html_container">
+        <t t-foreach="docs" t-as="o">
+            <div class="article" style="padding: 10px; font-family: Arial, sans-serif; color: #000; font-size: 6px; line-height: 1.2;">
+                
+                <style>
+                    /* Estilo estandarizado idéntico a Libros Fiscales y Comprobante IVA */
+                    .clean-table { width: 100%; border-collapse: collapse; border: none !important; }
+                    .clean-table th { background-color: #e6e6e6; color: #000; font-weight: bold; text-align: center; border-top: 0.5px solid #000 !important; border-bottom: 0.5px solid #000 !important; padding: 2px; }
+                    .clean-table td { padding: 2px; border: none !important; }
+                    .totals-row td { background-color: #f2f2f2; font-weight: bold; border-top: 0.5px solid #000 !important; border-bottom: 0.5px solid #000 !important; padding: 3px; }
+                    
+                    /* Bloqueo agresivo para evitar que Odoo dibuje cuadros no deseados */
+                    table, tr, td, th, tbody, thead {
+                        border-style: none !important;
+                        outline: none !important;
+                    }
+                </style>
+
+                <table frame="void" rules="none" border="0" cellpadding="0" cellspacing="0" style="width: 100%; border-collapse: collapse; margin-bottom: 10px; border: 0 !important;">
+                    <tr style="border: 0 !important;">
+                        <td style="width: 33%; vertical-align: top; text-align: left; padding: 2px; border: 0 !important;">
+                            <div style="font-weight: bold; font-size: 10px; margin-bottom: 2px; text-transform: uppercase;"><t t-out="o.company_id.name.upper()"/></div>
+                            <div style="font-size: 7px; margin-bottom: 2px; text-transform: uppercase;"><t t-out="o.company_id.street"/>, <t t-out="o.company_id.city"/></div>
+                            <div style="font-weight: bold; font-size: 9px;">R.I.F.: <t t-out="o.company_id.vat"/></div>
+                        </td>
+                        <td style="width: 34%; vertical-align: top; text-align: center; padding: 2px; border: 0 !important;">
+                            <div style="font-weight: bold; margin-bottom: 0; font-size: 11px; text-decoration: underline; text-transform: uppercase;">COMPROBANTE DE RETENCIÓN ISLR</div>
+                            <div style="font-size: 6px; line-height: 1.1; margin-top: 4px; color: #333;">
+                                Ley de Impuesto Sobre la Renta: "Los agentes de retención están obligados a entregar a los contribuyentes, un comprobante en el que conste el monto de lo pagado o abonado en cuenta y el impuesto retenido."
+                            </div>
+                        </td>
+                        <td style="width: 33%; vertical-align: top; text-align: right; padding: 2px; border: 0 !important;">
+                            <div style="font-weight: bold; font-size: 9px; margin-top: 4px;">
+                                <span>Nro. Comprobante:</span> <span t-out="o.name"/>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+
+                <table frame="void" rules="none" border="0" cellpadding="0" cellspacing="0" style="width: 100%; border-collapse: collapse; margin-bottom: 12px; border: 0 !important;">
+                    <tr style="border: 0 !important;">
+                        <td style="width: 80%; vertical-align: top; padding: 0; border: 0 !important;">
+                            <table frame="void" rules="none" border="0" cellpadding="0" cellspacing="0" style="width: 100%; border-collapse: collapse; border: 0 !important;">
+                                <tr style="border: 0 !important;">
+                                    <td style="width: 60%; padding: 2px; border: 0 !important;">
+                                        <div style="font-weight: bold; font-size: 6px; color: #555; text-transform: uppercase;">NOMBRE O RAZÓN SOCIAL DEL AGENTE DE RETENCIÓN</div>
+                                        <div style="font-weight: bold; font-size: 9px; text-transform: uppercase;"><t t-out="o.company_id.name.upper()"/></div>
+                                    </td>
+                                    <td style="width: 40%; padding: 2px; border: 0 !important;">
+                                        <div style="font-weight: bold; font-size: 6px; color: #555; text-transform: uppercase;">R.I.F. AGENTE DE RETENCIÓN</div>
+                                        <div style="font-weight: bold; font-size: 9px;"><t t-out="o.company_id.vat"/></div>
+                                    </td>
+                                </tr>
+                                <tr style="border: 0 !important;">
+                                    <td colspan="2" style="padding: 2px; border: 0 !important;">
+                                        <div style="font-weight: bold; font-size: 6px; color: #555; text-transform: uppercase;">DIRECCIÓN FISCAL DEL AGENTE DE RETENCIÓN</div>
+                                        <div style="font-weight: bold; text-transform: uppercase;">
+                                            <t t-out="o.company_id.street"/>, <t t-out="o.company_id.city"/>, <t t-out="o.company_id.state_id.name"/>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr style="border: 0 !important;">
+                                    <td style="padding: 2px; padding-top: 6px; border: 0 !important;">
+                                        <div style="font-weight: bold; font-size: 6px; color: #555; text-transform: uppercase;">NOMBRE O RAZÓN SOCIAL DEL SUJETO RETENIDO</div>
+                                        <div style="font-weight: bold; font-size: 9px; text-transform: uppercase;"><t t-out="o.partner_id.name.upper()"/></div>
+                                    </td>
+                                    <td style="padding: 2px; padding-top: 6px; border: 0 !important;">
+                                        <div style="font-weight: bold; font-size: 6px; color: #555; text-transform: uppercase;">R.I.F. SUJETO RETENIDO</div>
+                                        <div style="font-weight: bold; font-size: 9px;"><t t-out="o.partner_id.vat"/></div>
+                                    </td>
+                                </tr>
+                                <tr style="border: 0 !important;">
+                                    <td colspan="2" style="padding: 2px; border: 0 !important;">
+                                        <div style="font-weight: bold; font-size: 6px; color: #555; text-transform: uppercase;">DIRECCIÓN FISCAL DEL SUJETO RETENIDO</div>
+                                        <div style="font-weight: bold; text-transform: uppercase;">
+                                            <t t-out="o.partner_id.street or ''"/> <t t-out="o.partner_id.city or ''"/> <t t-out="o.partner_id.state_id.name or ''"/>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td style="width: 20%; vertical-align: top; text-align: right; padding: 2px; border: 0 !important;">
+                            <div style="margin-bottom: 6px;">
+                                <div style="font-weight: bold; font-size: 6px; color: #555; text-transform: uppercase;">FECHA DE EMISIÓN</div>
+                                <div style="font-weight: bold; font-size: 10px;">
+                                    <t t-out="o.date" t-options='{"widget": "date"}'/>
+                                </div>
+                            </div>
+                            <div>
+                                <div style="font-weight: bold; font-size: 6px; color: #555; text-transform: uppercase;">PERIODO FISCAL</div>
+                                <div style="font-weight: bold; font-size: 10px;">
+                                    Año: <t t-out="o.date.strftime('%Y')"/> / Mes: <t t-out="o.date.strftime('%m')"/>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="clean-table" style="width: 100%; margin-top: 15px;">
+                    <thead>
+                        <tr>
+                            <th style="width: 4%;">Oper.<br/>Nº</th>
+                            <th style="width: 8%;">Fecha</th>
+                            <th style="width: 8%;">Tipo<br/>Doc.</th>
+                            <th style="width: 14%;">Nro.<br/>Documento</th>
+                            <th style="width: 12%;">Monto<br/>Documento</th>
+                            <th style="width: 12%;">Monto<br/>Abonado</th>
+                            <th style="width: 12%;">Base<br/>Imponible</th>
+                            <th style="width: 10%;">Sustraendo</th>
+                            <th style="width: 8%;">%<br/>Ret.</th>
+                            <th style="width: 12%;">Monto<br/>Retenido</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-set="all_lines" t-value="o.line_ids if o._name == 'account.wh.islr' else o.line_ids.mapped('line_ids')"/>
+                        <t t-set="count" t-value="1"/>
+                        <t t-foreach="all_lines" t-as="line">
+                            <tr style="text-align: center;">
+                                <td><t t-out="count"/><t t-set="count" t-value="count+1"/></td>
+                                <td><t t-out="line.invoice_date" t-options='{"widget": "date"}'/></td>
+                                <td>Factura</td>
+                                <td><t t-out="line.invoice_number"/></td>
+                                <td style="text-align: right;">
+                                    <t t-out="'{0:,.2f}'.format(line.base_amount).replace(',', 'X').replace('.', ',').replace('X', '.')"/>
+                                </td>
+                                <td style="text-align: right;">
+                                    <t t-out="'{0:,.2f}'.format(line.base_amount).replace(',', 'X').replace('.', ',').replace('X', '.')"/>
+                                </td>
+                                <td style="text-align: right;">
+                                    <t t-out="'{0:,.2f}'.format(line.base_amount).replace(',', 'X').replace('.', ',').replace('X', '.')"/>
+                                </td>
+                                <td style="text-align: right;">
+                                    <t t-out="'{0:,.2f}'.format(line.subtrahend).replace(',', 'X').replace('.', ',').replace('X', '.')"/>
+                                </td>
+                                <td>
+                                    <t t-out="int(line.retention_percentage) if line.retention_percentage % 1 == 0 else line.retention_percentage"/>%
+                                </td>
+                                <td style="text-align: right; font-weight: bold;">
+                                    <t t-out="'{0:,.2f}'.format(line.retention_amount).replace(',', 'X').replace('.', ',').replace('X', '.')"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" style="font-size: 5px; color: #555; text-align: right; padding-bottom: 4px;">Concepto:</td>
+                                <td colspan="7" style="font-size: 5px; text-align: left; padding-bottom: 4px;">
+                                    <t t-out="line.concept_id.description.upper()"/>
+                                </td>
+                            </tr>
+                        </t>
+                        <tr class="totals-row" style="text-align: right;">
+                            <td colspan="4" style="text-align: right; padding-right: 5px;">TOTALES:</td>
+                            <td>
+                                <t t-set="total_base" t-value="sum(all_lines.mapped('base_amount'))"/>
+                                <t t-out="'{0:,.2f}'.format(total_base).replace(',', 'X').replace('.', ',').replace('X', '.')"/>
+                            </td>
+                            <td>
+                                <t t-out="'{0:,.2f}'.format(total_base).replace(',', 'X').replace('.', ',').replace('X', '.')"/>
+                            </td>
+                            <td>
+                                <t t-out="'{0:,.2f}'.format(total_base).replace(',', 'X').replace('.', ',').replace('X', '.')"/>
+                            </td>
+                            <td>
+                                <t t-set="total_sub" t-value="sum(all_lines.mapped('subtrahend'))"/>
+                                <t t-out="'{0:,.2f}'.format(total_sub).replace(',', 'X').replace('.', ',').replace('X', '.')"/>
+                            </td>
+                            <td/>
+                            <td>
+                                <t t-set="total_ret" t-value="sum(all_lines.mapped('retention_amount'))"/>
+                                <t t-out="'{0:,.2f}'.format(total_ret).replace(',', 'X').replace('.', ',').replace('X', '.')"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <table frame="void" rules="none" border="0" cellpadding="0" cellspacing="0" style="width: 100%; margin-top: 40px; border: 0 !important; page-break-inside: avoid;">
+                    <tr style="border: 0 !important;">
+                        <td style="width: 50%; text-align: center; border: 0 !important; vertical-align: top;">
+                            <div style="width: 80%; border-top: 0.5px solid #000; margin: 0 auto;"/>
+                            <div style="font-weight: bold; font-size: 6px; margin-top: 5px;">FIRMA Y SELLO AGENTE DE RETENCIÓN</div>
+                        </td>
+                        <td style="width: 50%; text-align: center; border: 0 !important; vertical-align: top;">
+                            <table frame="void" rules="none" border="0" cellpadding="0" cellspacing="0" style="width: 80%; margin: 0 auto; font-size: 6px; text-align: left; border: 0 !important;">
+                                <tr style="border: 0 !important;"><td style="padding-bottom: 3px; border: 0 !important;">Nombre: ________________________________</td></tr>
+                                <tr style="border: 0 !important;"><td style="padding-bottom: 3px; border: 0 !important;">Cédula: ________________________________</td></tr>
+                                <tr style="border: 0 !important;"><td style="padding-bottom: 8px; border: 0 !important;">Fecha de Entrega: ____ / ____ / _________</td></tr>
+                                <tr style="border: 0 !important;">
+                                    <td style="padding-top: 8px; border-top: 0.5px solid #000 !important; border-left: 0 !important; border-right: 0 !important; border-bottom: 0 !important; text-align: center;">
+                                        <div style="font-weight: bold; font-size: 6px;">FIRMA DEL BENEFICIARIO</div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </t>
+    </t>
+</t>

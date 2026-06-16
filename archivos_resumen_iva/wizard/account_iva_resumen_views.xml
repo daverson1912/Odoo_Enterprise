@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_account_iva_resumen_wizard_form" model="ir.ui.view">
+        <field name="name">account.iva.resumen.wizard.form</field>
+        <field name="model">account.iva.resumen.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Resumen de IVA">
+                <sheet>
+                    <div class="alert alert-info" role="alert" invisible="state != 'draft'">
+                        <p>Seleccione el período y la compañía para generar el Resumen de IVA unificado (Débitos y Créditos Fiscales).</p>
+                    </div>
+
+                    <div class="alert alert-success" role="alert" invisible="state != 'done'">
+                        <p><strong>✅ Resumen de IVA generado exitosamente.</strong> Puede descargar el PDF o Excel usando los enlaces a continuación.</p>
+                    </div>
+
+                    <group invisible="state != 'draft'">
+                        <group string="Filtros del Periodo">
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group string="Saldos del Mes Anterior (Opcional)">
+                            <field name="excedente_anterior"/>
+                            <field name="retenciones_acumuladas"/>
+                        </group>
+                    </group>
+
+                    <group invisible="state != 'done'">
+                        <group string="Descargar PDF" invisible="not pdf_file">
+                            <field name="pdf_filename" invisible="1"/>
+                            <field name="pdf_file" filename="pdf_filename" readonly="1" string="Archivo PDF"/>
+                        </group>
+                        <group string="Descargar Excel" invisible="not excel_file">
+                            <field name="excel_filename" invisible="1"/>
+                            <field name="excel_file" filename="excel_filename" readonly="1" string="Archivo Excel"/>
+                        </group>
+                    </group>
+
+                    <field name="state" invisible="1"/>
+                </sheet>
+                <footer>
+                    <button name="action_generate_pdf" string="Generar PDF" type="object" class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_generate_excel" string="Generar Excel" type="object" class="btn-primary" invisible="state != 'draft'"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel" invisible="state != 'draft'"/>
+                    <button string="Cerrar" class="btn-secondary" special="cancel" invisible="state != 'done'"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_account_iva_resumen_wizard" model="ir.actions.act_window">
+        <field name="name">Resumen de IVA</field>
+        <field name="res_model">account.iva.resumen.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

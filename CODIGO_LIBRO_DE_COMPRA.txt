@@ -1,0 +1,148 @@
+<t t-name="l10n_ve_simplit_fiscal.report_purchase_ledger">
+    <t t-call="web.html_container">
+        <t t-foreach="docs" t-as="o">
+            <div class="article" style="font-family: Arial, sans-serif; font-size: 6px; color: #000; width: 100%;">
+                
+                <style>
+                    table, tr, td, th, tbody, thead {
+                        border: 0 !important;
+                        border-style: none !important;
+                        border-width: 0 !important;
+                        border-collapse: collapse !important;
+                        border-spacing: 0 !important;
+                        outline: none !important;
+                    }
+                    * {
+                        border: 0 !important;
+                        border-style: none !important;
+                    }
+                </style>
+
+                <div style="width: 100%; margin-bottom: 8px;">
+                    <div style="font-weight: bold;">CONTRIBUYENTE: <t t-esc="o.company_id.name"/></div>
+                    <div style="font-weight: bold;">R.I.F. No.: <t t-esc="o.company_id.vat"/></div>
+                    <div style="font-weight: bold;">DIRECCIÓN FISCAL: <t t-esc="o.company_id.street"/> <t t-esc="o.company_id.city"/></div>
+                    <br/>
+                    <div style="font-weight: bold; font-size: 10px; text-align: center;">
+                        LIBRO DE COMPRAS CORRESPONDIENTE AL PERIODO <t t-esc="o.date_from.strftime('%m')"/> Año: <t t-esc="o.date_from.strftime('%Y')"/>
+                    </div>
+                </div>
+
+                <table frame="void" rules="none" border="0" cellpadding="0" cellspacing="0" style="width: 100%; border-collapse: collapse; border: 0; margin: 0; padding: 0;">
+                    <colgroup>
+                        <col style="width: 2%;"/> <col style="width: 4%;"/> <col style="width: 6%;"/> <col style="width: 12%;"/>
+                        <col style="width: 3%;"/> <col style="width: 3%;"/> <col style="width: 3%;"/> <col style="width: 3%;"/>
+                        <col style="width: 2%;"/> <col style="width: 2%;"/> <col style="width: 2%;"/> <col style="width: 4%;"/>
+                        <col style="width: 4%;"/> <col style="width: 3%;"/> <col style="width: 4%;"/> <col style="width: 1%;"/> <col style="width: 4%;"/>
+                        <col style="width: 4%;"/> <col style="width: 3%;"/> <col style="width: 4%;"/> <col style="width: 1%;"/> <col style="width: 4%;"/>
+                        <col style="width: 4%;"/> <col style="width: 1%;"/> <col style="width: 4%;"/>
+                        <col style="width: 4%;"/> <col style="width: 3%;"/> <col style="width: 4%;"/>
+                    </colgroup>
+                    
+                    <thead>
+                        <tr style="text-align: center; font-weight: bold; background-color: #f2f2f2; border-top: 0.5px solid #000 !important; border-bottom: 0.5px solid #000 !important;">
+                            <th colspan="12" style="padding: 2px;">DATOS DE LA OPERACIÓN</th>
+                            <th colspan="5" style="padding: 2px;">COMPRAS IMPORTACIONES</th>
+                            <th colspan="8" style="padding: 2px;">COMPRAS INTERNAS</th>
+                            <th colspan="3" style="padding: 2px;">RETENCIÓN IVA</th>
+                        </tr>
+                        <tr style="text-align: center; font-weight: bold; background-color: #e6e6e6; font-size: 5px; border-top: 0.5px solid #000 !important; border-bottom: 0.5px solid #000 !important;">
+                            <th style="padding: 2px;">Oper Nro</th>
+                            <th style="padding: 2px;">Fecha Factura</th>
+                            <th style="padding: 2px;">RIF</th>
+                            <th style="padding: 2px;">Nombre o Razón Social</th>
+                            <th style="padding: 2px;">Nro Planilla Imp</th>
+                            <th style="padding: 2px;">Nro Exped Imp</th>
+                            <th style="padding: 2px;">Nro Factura</th>
+                            <th style="padding: 2px;">Nro Control</th>
+                            <th style="padding: 2px;">Nro Nota Débito</th>
+                            <th style="padding: 2px;">Nro Nota Crédito</th>
+                            <th style="padding: 2px;">Tipo Trans</th>
+                            <th style="padding: 2px;">Fact Afectada</th>
+                            <th style="padding: 2px;">Total c/IVA</th> <th style="padding: 2px;">Exentas</th> <th style="padding: 2px;">Base</th> <th style="padding: 2px;">%</th> <th style="padding: 2px;">IVA</th>
+                            <th style="padding: 2px;">Total c/IVA</th> <th style="padding: 2px;">Exentas</th> <th style="padding: 2px;">Base</th> <th style="padding: 2px;">%</th> <th style="padding: 2px;">IVA</th>
+                            <th style="padding: 2px;">Base</th> <th style="padding: 2px;">%</th> <th style="padding: 2px;">IVA</th>
+                            <th style="padding: 2px;">IVA Retenido</th>
+                            <th style="padding: 2px;">Nro Comprob</th>
+                            <th style="padding: 2px;">Fecha Comp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-set="lines" t-value="o._get_ledger_data()"/>
+                        <t t-foreach="lines" t-as="l">
+                             <tr style="text-align: center;">
+                                <td style="padding: 1px;"><t t-esc="l['ope']"/></td>
+                                <td style="padding: 1px;"><t t-esc="l['date'].strftime('%d/%m/%Y')"/></td>
+                                <td style="padding: 1px;"><t t-esc="l['rif']"/></td>
+                                <td style="padding: 1px; text-align: left;"><t t-esc="l['partner_name']"/></td>
+                                <td style="padding: 1px;"><t t-esc="l.get('import_plan', '')"/></td>
+                                <td style="padding: 1px;"><t t-esc="l.get('import_exp', '')"/></td>
+                                <td style="padding: 1px;"><t t-esc="l['doc_number']"/></td>
+                                <td style="padding: 1px;"><t t-esc="l['control_number']"/></td>
+                                <td style="padding: 1px;"><t t-esc="l.get('debit_note', '')"/></td>
+                                <td style="padding: 1px;"><t t-esc="l.get('credit_note', '')"/></td>
+                                <td style="padding: 1px;"><t t-esc="l['tran_type']"/></td>
+                                <td style="padding: 1px;"><t t-esc="l['affected_doc']"/></td>
+                                
+                                <td style="padding: 1px; text-align: right;"><t t-if="l.get('is_import')"><t t-esc="'{:,.2f}'.format(l['total_with_iva']).replace(',', 'X').replace('.', ',').replace('X', '.')"/></t><t t-else="">0,00</t></td>
+                                <td style="padding: 1px; text-align: right;"><t t-if="l.get('is_import')"><t t-esc="'{:,.2f}'.format(l['exempt_amount']).replace(',', 'X').replace('.', ',').replace('X', '.')"/></t><t t-else="">0,00</t></td>
+                                <td style="padding: 1px; text-align: right;"><t t-if="l.get('is_import')"><t t-esc="'{:,.2f}'.format(l['taxable_base']).replace(',', 'X').replace('.', ',').replace('X', '.')"/></t><t t-else="">0,00</t></td>
+                                <td style="padding: 1px;"><t t-if="l.get('is_import')">16</t><t t-else="">0</t></td>
+                                <td style="padding: 1px; text-align: right;"><t t-if="l.get('is_import')"><t t-esc="'{:,.2f}'.format(l['iva_amount']).replace(',', 'X').replace('.', ',').replace('X', '.')"/></t><t t-else="">0,00</t></td>
+                                
+                                <td style="padding: 1px; text-align: right;"><t t-if="not l.get('is_import')"><t t-esc="'{:,.2f}'.format(l['total_with_iva']).replace(',', 'X').replace('.', ',').replace('X', '.')"/></t><t t-else="">0,00</t></td>
+                                <td style="padding: 1px; text-align: right;"><t t-if="not l.get('is_import')"><t t-esc="'{:,.2f}'.format(l['exempt_amount']).replace(',', 'X').replace('.', ',').replace('X', '.')"/></t><t t-else="">0,00</t></td>
+                                
+                                <td style="padding: 1px; text-align: right;"><t t-if="not l.get('is_import') and l.get('iva_rate') == '16%'"><t t-esc="'{:,.2f}'.format(l['taxable_base']).replace(',', 'X').replace('.', ',').replace('X', '.')"/></t><t t-else="">0,00</t></td>
+                                <td style="padding: 1px;"><t t-if="not l.get('is_import') and l.get('iva_rate') == '16%'">16</t><t t-else="">0</t></td>
+                                <td style="padding: 1px; text-align: right;"><t t-if="not l.get('is_import') and l.get('iva_rate') == '16%'"><t t-esc="'{:,.2f}'.format(l['iva_amount']).replace(',', 'X').replace('.', ',').replace('X', '.')"/></t><t t-else="">0,00</t></td>
+                                
+                                <td style="padding: 1px; text-align: right;"><t t-if="not l.get('is_import') and l.get('iva_rate') == '8%'"><t t-esc="'{:,.2f}'.format(l['taxable_base']).replace(',', 'X').replace('.', ',').replace('X', '.')"/></t><t t-else="">0,00</t></td>
+                                <td style="padding: 1px;"><t t-if="not l.get('is_import') and l.get('iva_rate') == '8%'">8</t><t t-else="">0</t></td>
+                                <td style="padding: 1px; text-align: right;"><t t-if="not l.get('is_import') and l.get('iva_rate') == '8%'"><t t-esc="'{:,.2f}'.format(l['iva_amount']).replace(',', 'X').replace('.', ',').replace('X', '.')"/></t><t t-else="">0,00</t></td>
+                                
+                                <td style="padding: 1px; text-align: right;"><t t-esc="'{:,.2f}'.format(l.get('wh_amount', 0.0)).replace(',', 'X').replace('.', ',').replace('X', '.')"/></td>
+                                <td style="padding: 1px;"><t t-esc="l.get('wh_number', '')"/></td>
+                                <td style="padding: 1px;"><t t-esc="l.get('wh_date', '')"/></td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+
+                <div style="margin-top: 12px; display: flex; gap: 20px;">
+                    <div style="width: 45%;">
+                        <table frame="void" rules="none" border="0" cellpadding="0" cellspacing="0" style="width: 100%; border-collapse: collapse; border: 0;">
+                            <tr style="background-color: #e6e6e6; font-weight: bold; text-align: center; border-top: 0.5px solid #000 !important; border-bottom: 0.5px solid #000 !important;">
+                                <td colspan="3" style="padding: 3px; font-size: 7px;">RESUMEN DE CRÉDITO FISCAL (INTERNAS)</td>
+                            </tr>
+                            <tr style="background-color: #f2f2f2; font-weight: bold; text-align: center; border-bottom: 0.5px solid #000 !important;">
+                                <td style="width: 50%; padding: 2px; font-size: 6px;">Descripción</td>
+                                <td style="width: 25%; padding: 2px; font-size: 6px;">Base</td>
+                                <td style="width: 25%; padding: 2px; font-size: 6px;">Crédito</td>
+                            </tr>
+                            <tr><td style="padding-left: 5px; font-size: 6px;">Alícuota General (16%)</td><td style="text-align: right; padding-right: 5px; font-size: 6px;">...</td><td style="text-align: right; padding-right: 5px; font-size: 6px;">...</td></tr>
+                            <tr><td style="padding-left: 5px; font-size: 6px;">Alícuota Reducida (8%)</td><td style="text-align: right; padding-right: 5px; font-size: 6px;">...</td><td style="text-align: right; padding-right: 5px; font-size: 6px;">...</td></tr>
+                            <tr style="font-weight: bold; background-color: #f2f2f2; border-top: 0.5px solid #000 !important;"><td style="padding-left: 5px; font-size: 6px;">TOTAL</td><td style="text-align: right; padding-right: 5px; font-size: 6px;">...</td><td style="text-align: right; padding-right: 5px; font-size: 6px;">...</td></tr>
+                        </table>
+                    </div>
+
+                    <div style="width: 45%;">
+                        <table frame="void" rules="none" border="0" cellpadding="0" cellspacing="0" style="width: 100%; border-collapse: collapse; border: 0;">
+                            <tr style="background-color: #e6e6e6; font-weight: bold; text-align: center; border-top: 0.5px solid #000 !important; border-bottom: 0.5px solid #000 !important;">
+                                <td colspan="3" style="padding: 3px; font-size: 7px;">RESUMEN DE IMPORTACIONES</td>
+                            </tr>
+                            <tr style="background-color: #f2f2f2; font-weight: bold; text-align: center; border-bottom: 0.5px solid #000 !important;">
+                                <td style="width: 50%; padding: 2px; font-size: 6px;">Descripción</td>
+                                <td style="width: 25%; padding: 2px; font-size: 6px;">Base</td>
+                                <td style="width: 25%; padding: 2px; font-size: 6px;">Crédito</td>
+                            </tr>
+                            <tr><td style="padding-left: 5px; font-size: 6px;">Compras Importación</td><td style="text-align: right; padding-right: 5px; font-size: 6px;">...</td><td style="text-align: right; padding-right: 5px; font-size: 6px;">...</td></tr>
+                            <tr style="font-weight: bold; background-color: #f2f2f2; border-top: 0.5px solid #000 !important;"><td style="padding-left: 5px; font-size: 6px;">TOTAL</td><td style="text-align: right; padding-right: 5px; font-size: 6px;">...</td><td style="text-align: right; padding-right: 5px; font-size: 6px;">...</td></tr>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </t>
+    </t>
+</t>

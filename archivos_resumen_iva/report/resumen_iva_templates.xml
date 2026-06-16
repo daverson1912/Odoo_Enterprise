@@ -1,0 +1,541 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="resumen_iva_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <div class="page" style="padding: 10px; font-family: 'Arial', sans-serif; font-size: 8px; color: #000;">
+                    <t t-set="data" t-value="o._get_resumen_data()"/>
+                    <t t-set="d" t-value="data['debitos']"/>
+                    <t t-set="c" t-value="data['creditos']"/>
+                    <t t-set="fmt" t-value="lambda x: '{:,.2f}'.format(x).replace(',','X').replace('.',',').replace('X','.')"/>
+
+                    <!-- Encabezado Principal -->
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px;">
+                        <tr>
+                            <td style="width: 50%; vertical-align: top;">
+                                <div style="font-weight: bold; font-size: 11px; text-transform: uppercase;"><t t-esc="o.company_id.name"/></div>
+                                <div style="font-size: 9px; color: #333;">R.I.F.: <t t-esc="o.company_id.vat or ''"/></div>
+                            </td>
+                            <td style="width: 50%; text-align: right; vertical-align: top;">
+                                <div style="font-size: 13px; font-weight: bold; color: #1B3A5C; margin-bottom: 2px;">RESUMEN DE IVA (FORMULARIO 30)</div>
+                                <div style="font-size: 9px; color: #333;">
+                                    <strong>PERIODO FISCAL:</strong> Desde <t t-esc="o.date_from.strftime('%d/%m/%Y')"/> Hasta <t t-esc="o.date_to.strftime('%d/%m/%Y')"/>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <!-- ============ DÉBITOS FISCALES (VENTAS) ============ -->
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 8px; font-size: 8px; border: 1px solid #1B3A5C;">
+                        <thead>
+                            <tr style="background-color: #1B3A5C; color: white;">
+                                <th colspan="8" style="padding: 4px; font-weight: bold; font-size: 9px; text-align: left;">DÉBITOS FISCALES</th>
+                            </tr>
+                            <tr style="background-color: #E8EDF2; color: #1B3A5C; font-weight: bold; text-align: center; border-bottom: 1px solid #1B3A5C;">
+                                <th style="width: 3%; border: 1px solid #1B3A5C; padding: 2px;">#</th>
+                                <th style="width: 50%; border: 1px solid #1B3A5C; padding: 2px; text-align: left;">Descripción</th>
+                                <th style="width: 5%; border: 1px solid #1B3A5C; padding: 2px;">Cas.B</th>
+                                <th style="width: 14%; border: 1px solid #1B3A5C; padding: 2px; text-align: right;">Base Imponible</th>
+                                <th style="width: 5%; border: 1px solid #1B3A5C; padding: 2px;">%</th>
+                                <th style="width: 5%; border: 1px solid #1B3A5C; padding: 2px;">Cas.I</th>
+                                <th style="width: 14%; border: 1px solid #1B3A5C; padding: 2px; text-align: right;">Débito Fiscal</th>
+                                <th style="width: 4%; border: 1px solid #1B3A5C; padding: 2px;">Chk</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 1. Ventas no gravadas -->
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">1</td>
+                                <td style="border-right: 1px solid #ddd; padding: 2px;">VENTAS INTERNES NO GRAVADAS</td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">40</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(d['ventas_no_gravadas'])"/></td>
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: center; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;">0,00</td>
+                                <td style="text-align: center; padding: 2px;">0</td>
+                            </tr>
+                            <!-- 2. Ventas exportacion -->
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">2</td>
+                                <td style="border-right: 1px solid #ddd; padding: 2px;">VENTAS DE EXPORTACION</td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">41</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(d['ventas_exportacion'])"/></td>
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: center; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;">0,00</td>
+                                <td style="text-align: center; padding: 2px;">0</td>
+                            </tr>
+                            <!-- 3. Ventas Alicuota General -->
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">3</td>
+                                <td style="border-right: 1px solid #ddd; padding: 2px;">VENTAS INTERNAS GRAVADAS POR ALICUOTA GENERAL</td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">42</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(d['ventas_alicuota_general'])"/></td>
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">16</td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">43</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(d['iva_alicuota_general'])"/></td>
+                                <td style="text-align: center; padding: 2px;">7</td>
+                            </tr>
+                            <!-- 4. Ventas Alicuota General + Adicional -->
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">4</td>
+                                <td style="border-right: 1px solid #ddd; padding: 2px;">VENTAS INTERNAS GRAVADAS POR ALICUOTA GENERAL MAS ALICUOTA ADICIONAL</td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">44</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(d['ventas_alicuota_general_adicional'])"/></td>
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">31</td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">45</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(d['iva_alicuota_general_adicional'])"/></td>
+                                <td style="text-align: center; padding: 2px;">8</td>
+                            </tr>
+                            <!-- 5. Ventas Alicuota Reducida -->
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">5</td>
+                                <td style="border-right: 1px solid #ddd; padding: 2px;">VENTAS INTERNAS GRAVADAS POR ALICUOTA REDUCIDA</td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">442</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(d['ventas_alicuota_reducida'])"/></td>
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">8</td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">443</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(d['iva_alicuota_reducida'])"/></td>
+                                <td style="text-align: center; padding: 2px;">7</td>
+                            </tr>
+                            <!-- 6. Total Determinacion -->
+                            <tr style="background-color: #E8EDF2; font-weight: bold; border-bottom: 1px solid #aaa;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">6</td>
+                                <td style="border-right: 1px solid #ddd; padding: 2px;">TOTAL VENTAS Y DEBITOS FISCALES PARA EFECTOS DE DETERMINACION</td>
+                                <td style="text-align: center; background-color: #e0e6ed; border-right: 1px solid #ddd; padding: 2px;">46</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(data['total_base_debitos'])"/></td>
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: center; background-color: #e0e6ed; border-right: 1px solid #ddd; padding: 2px;">47</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(data['total_debitos'])"/></td>
+                                <td style="text-align: center; padding: 2px;">3</td>
+                            </tr>
+                            <!-- 7. Ajuste periodos anteriores -->
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">7</td>
+                                <td style="border-right: 1px solid #ddd; padding: 2px;">AJUSTE A LOS DEBITOS FISCALES DE PERIODOS ANTERIORES</td>
+                                <td style="text-align: center; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">48</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(d['ajuste_periodos_anteriores'])"/></td>
+                                <td style="text-align: center; padding: 2px;">2</td>
+                            </tr>
+                            <!-- 8. Exonerados -->
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">8</td>
+                                <td style="border-right: 1px solid #ddd; padding: 2px;">CERTIFICADO DE DEBITOS FISCALES EXONERADOS (RECIBIDOS DE ENTES EXONERADOS)</td>
+                                <td style="text-align: center; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">50</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;">0,00</td>
+                                <td style="text-align: center; padding: 2px;">0</td>
+                            </tr>
+                            <!-- 9. Total debitos -->
+                            <tr style="background-color: #E8EDF2; font-weight: bold;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">9</td>
+                                <td style="border-right: 1px solid #ddd; padding: 2px;">TOTAL DEBITOS FISCALES</td>
+                                <td style="text-align: center; background-color: #e0e6ed; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: center; background-color: #e0e6ed; border-right: 1px solid #ddd; padding: 2px;">49</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(data['total_debitos_fiscales'])"/></td>
+                                <td style="text-align: center; padding: 2px;">1</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- ============ CRÉDITOS FISCALES (COMPRAS) ============ -->
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 8px; font-size: 8px; border: 1px solid #1B3A5C;">
+                        <thead>
+                            <tr style="background-color: #1B3A5C; color: white;">
+                                <th colspan="8" style="padding: 4px; font-weight: bold; font-size: 9px; text-align: left;">CRÉDITOS FISCALES</th>
+                            </tr>
+                            <tr style="background-color: #E8EDF2; color: #1B3A5C; font-weight: bold; text-align: center; border-bottom: 1px solid #1B3A5C;">
+                                <th style="width: 3%; border: 1px solid #1B3A5C; padding: 2px;">#</th>
+                                <th style="width: 50%; border: 1px solid #1B3A5C; padding: 2px; text-align: left;">Descripción</th>
+                                <th style="width: 5%; border: 1px solid #1B3A5C; padding: 2px;">Cas.B</th>
+                                <th style="width: 14%; border: 1px solid #1B3A5C; padding: 2px; text-align: right;">Base Imponible</th>
+                                <th style="width: 5%; border: 1px solid #1B3A5C; padding: 2px;">%</th>
+                                <th style="width: 5%; border: 1px solid #1B3A5C; padding: 2px;">Cas.I</th>
+                                <th style="width: 14%; border: 1px solid #1B3A5C; padding: 2px; text-align: right;">Crédito Fiscal</th>
+                                <th style="width: 4%; border: 1px solid #1B3A5C; padding: 2px;">Chk</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 10. Compras no gravadas -->
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">10</td>
+                                <td style="border-right: 1px solid #ddd; padding: 2px;">COMPRAS NO GRAVADAS Y/O SIN DERECHO A CREDITO FISCAL</td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">30</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(c['compras_no_gravadas'])"/></td>
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: center; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;">0,00</td>
+                                <td style="text-align: center; padding: 2px;">0</td>
+                            </tr>
+                            <!-- 11. Importación General -->
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">11</td>
+                                <td style="border-right: 1px solid #ddd; padding: 2px;">IMPORTACION GRAVADA POR ALICUOTA GENERAL</td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">31</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(c['compras_importacion_general'])"/></td>
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">16</td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">32</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(c['iva_importacion_general'])"/></td>
+                                <td style="text-align: center; padding: 2px;">8</td>
+                            </tr>
+                            <!-- 12. Importación Adicional -->
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">12</td>
+                                <td style="border-right: 1px solid #ddd; padding: 2px;">IMPORTACIONES GRAVADAS POR ALICUOTA GENERAL MAS ADICIONAL</td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">310</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(c['compras_importacion_adicional'])"/></td>
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">31</td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">320</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(c['iva_importacion_adicional'])"/></td>
+                                <td style="text-align: center; padding: 2px;">8</td>
+                            </tr>
+                            <!-- 13. Importación Reducida -->
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">13</td>
+                                <td style="border-right: 1px solid #ddd; padding: 2px;">IMPORTACIONES GRAVADAS POR ALICUOTA REDUCIDA</td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">312</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(c['compras_importacion_reducida'])"/></td>
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">8</td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">322</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(c['iva_importacion_reducida'])"/></td>
+                                <td style="text-align: center; padding: 2px;">7</td>
+                            </tr>
+                            <!-- 14. Compras Internas General -->
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">14</td>
+                                <td style="border-right: 1px solid #ddd; padding: 2px;">COMPRAS INTERNAS GRAVADAS POR ALICUOTA GENERAL</td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">33</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(c['compras_alicuota_general'])"/></td>
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">16</td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">34</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(c['iva_alicuota_general'])"/></td>
+                                <td style="text-align: center; padding: 2px;">6</td>
+                            </tr>
+                            <!-- 15. Compras Internas Adicional -->
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">15</td>
+                                <td style="border-right: 1px solid #ddd; padding: 2px;">COMPRAS INTERNAS GRAVADAS POR ALICUOTA GENERAL MAS ADICIONAL</td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">330</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(c['compras_alicuota_general_adicional'])"/></td>
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">31</td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">340</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(c['iva_alicuota_general_adicional'])"/></td>
+                                <td style="text-align: center; padding: 2px;">8</td>
+                            </tr>
+                            <!-- 16. Compras Internas Reducida -->
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">16</td>
+                                <td style="border-right: 1px solid #ddd; padding: 2px;">COMPRAS INTERNAS GRAVADAS POR ALICUOTA REDUCIDA</td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">332</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(c['compras_alicuota_reducida'])"/></td>
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">8</td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">342</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(c['iva_alicuota_reducida'])"/></td>
+                                <td style="text-align: center; padding: 2px;">7</td>
+                            </tr>
+                            <!-- 17. Total periodo -->
+                            <tr style="background-color: #E8EDF2; font-weight: bold; border-bottom: 1px solid #aaa;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">17</td>
+                                <td style="border-right: 1px solid #ddd; padding: 2px;">TOTAL COMPRAS Y CREDITOS FISCALES DEL PERIODO</td>
+                                <td style="text-align: center; background-color: #e0e6ed; border-right: 1px solid #ddd; padding: 2px;">35</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(data['total_base_creditos'])"/></td>
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: center; background-color: #e0e6ed; border-right: 1px solid #ddd; padding: 2px;">36</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(data['total_creditos'])"/></td>
+                                <td style="text-align: center; padding: 2px;">4</td>
+                            </tr>
+                            <!-- 18. Deducibles -->
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">18</td>
+                                <td style="border-right: 1px solid #ddd; padding: 2px;">CREDITOS FISCALES TOTALMENTE DEDUCIBLES</td>
+                                <td style="text-align: center; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">70</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(data['total_creditos_deducibles'])"/></td>
+                                <td style="text-align: center; padding: 2px;">0</td>
+                            </tr>
+                            <!-- 19. Prorrata -->
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">19</td>
+                                <td style="border-right: 1px solid #ddd; padding: 2px;">CREDITOS FISCALES PRODUCTO DE LA APLICACIÓN DE LA PRORRATA</td>
+                                <td style="text-align: center; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">37</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;">0,00</td>
+                                <td style="text-align: center; padding: 2px;">3</td>
+                            </tr>
+                            <!-- 20. Total Deducibles -->
+                            <tr style="background-color: #E8EDF2; font-weight: bold; border-bottom: 1px solid #eee;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">20</td>
+                                <td style="border-right: 1px solid #ddd; padding: 2px;">TOTAL CREDITOS FISCALES DEDUCIBLES</td>
+                                <td style="text-align: center; background-color: #e0e6ed; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: center; background-color: #e0e6ed; border-right: 1px solid #ddd; padding: 2px;">71</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(data['total_creditos_deducibles'])"/></td>
+                                <td style="text-align: center; padding: 2px;">9</td>
+                            </tr>
+                            <!-- 21. Excedente anterior -->
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">21</td>
+                                <td style="border-right: 1px solid #ddd; padding: 2px;">EXCEDENTE DE CREDITOS FISCALES DEL MES ANTERIOR</td>
+                                <td style="text-align: center; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">38</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(o.excedente_anterior)"/></td>
+                                <td style="text-align: center; padding: 2px;">0</td>
+                            </tr>
+                            <!-- 22. Reintegro exportadores -->
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">22</td>
+                                <td style="border-right: 1px solid #ddd; padding: 2px;">REINTEGRO SOLICITADO (SOLO EXPORTADORES)</td>
+                                <td style="text-align: center; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">21</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(c['reintegro_exportadores'])"/></td>
+                                <td style="text-align: center; padding: 2px;">9</td>
+                            </tr>
+                            <!-- 23. Reintegro Exonerados -->
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">23</td>
+                                <td style="border-right: 1px solid #ddd; padding: 2px;">REINTEGRO SOLICITADO (SOLO QUIEN ENTES EXONERADOS)</td>
+                                <td style="text-align: center; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">81</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(c['reintegro_exonerados'])"/></td>
+                                <td style="text-align: center; padding: 2px;">9</td>
+                            </tr>
+                            <!-- 24. Ajustes periodos anteriores -->
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">24</td>
+                                <td style="border-right: 1px solid #ddd; padding: 2px;">AJUSTES A LOS CREDITOS DE PERIODOS ANTERIORES</td>
+                                <td style="text-align: center; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">380</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(c['ajuste_periodos_anteriores'])"/></td>
+                                <td style="text-align: center; padding: 2px;">2</td>
+                            </tr>
+                            <!-- 25. Exonerados emitidos -->
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">25</td>
+                                <td style="border-right: 1px solid #ddd; padding: 2px;">CERTIFICADO DE DEBITOS FISCALES EXONERADOS (EMITIDOS POR ENTES EXONERADOS)</td>
+                                <td style="text-align: center; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">82</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;">0,00</td>
+                                <td style="text-align: center; padding: 2px;">8</td>
+                            </tr>
+                            <!-- 26. Total creditos -->
+                            <tr style="background-color: #E8EDF2; font-weight: bold;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">26</td>
+                                <td style="border-right: 1px solid #ddd; padding: 2px;">TOTAL CREDITOS FISCALES</td>
+                                <td style="text-align: center; background-color: #e0e6ed; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;"></td>
+                                <td style="text-align: center; background-color: #e0e6ed; border-right: 1px solid #ddd; padding: 2px;">39</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(data['total_creditos_fiscales'])"/></td>
+                                <td style="text-align: center; padding: 2px;">1</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- ============ AUTOLIQUIDACIÓN ============ -->
+                    <table style="width: 100%; border-collapse: collapse; font-size: 8px; border: 1px solid #1B3A5C;">
+                        <thead>
+                            <tr style="background-color: #1B3A5C; color: white;">
+                                <th colspan="8" style="padding: 4px; font-weight: bold; font-size: 9px; text-align: left;">AUTOLIQUIDACIÓN</th>
+                            </tr>
+                            <tr style="background-color: #E8EDF2; color: #1B3A5C; font-weight: bold; text-align: center; border-bottom: 1px solid #1B3A5C;">
+                                <th style="width: 3%; border: 1px solid #1B3A5C; padding: 2px;">#</th>
+                                <th colspan="4" style="width: 60%; border: 1px solid #1B3A5C; padding: 2px; text-align: left;">Descripción</th>
+                                <th style="width: 10%; border: 1px solid #1B3A5C; padding: 2px;">Casilla</th>
+                                <th style="width: 18%; border: 1px solid #1B3A5C; padding: 2px; text-align: right;">Monto</th>
+                                <th style="width: 5%; border: 1px solid #1B3A5C; padding: 2px;">Chk</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 27. Cuota -->
+                            <tr style="background-color: #E8EDF2; font-weight: bold; border-bottom: 1px solid #eee;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">27</td>
+                                <td colspan="4" style="border-right: 1px solid #ddd; padding: 2px;">TOTAL CUOTA TRIBUTARIA</td>
+                                <td style="text-align: center; font-weight: bold; background-color: #e0e6ed; border-right: 1px solid #ddd; padding: 2px;">53</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(data['cuota_tributaria'])"/></td>
+                                <td style="text-align: center; padding: 2px;">7</td>
+                            </tr>
+                            <!-- 28. Excedente -->
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">28</td>
+                                <td colspan="4" style="border-right: 1px solid #ddd; padding: 2px;">EXCEDENTE DE CREDITO FISCAL PARA EL MES SIGUIENTE</td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">60</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(data['excedente_siguiente'])"/></td>
+                                <td style="text-align: center; padding: 2px;">0</td>
+                            </tr>
+                            <!-- 29. Sustituida Pago -->
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">29</td>
+                                <td colspan="4" style="border-right: 1px solid #ddd; padding: 2px;">IMPUESTO PAGADO EN DECLARACION SUSTITUIDA</td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">22</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;">0,00</td>
+                                <td style="text-align: center; padding: 2px;">8</td>
+                            </tr>
+                            <!-- 30. Sustituida Retenciones -->
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">30</td>
+                                <td colspan="4" style="border-right: 1px solid #ddd; padding: 2px;">RETENCIONES DESCONTADAS EN DECLARACION SUSTITUIDA</td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">61</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;">0,00</td>
+                                <td style="text-align: center; padding: 2px;">8</td>
+                            </tr>
+                            <!-- 31. Sustituida Percepciones -->
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">31</td>
+                                <td colspan="4" style="border-right: 1px solid #ddd; padding: 2px;">PERCEPCIONES DESCONTADAS EN DECLARACION SUSTITUIDA</td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">24</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;">0,00</td>
+                                <td style="text-align: center; padding: 2px;">6</td>
+                            </tr>
+                            <!-- 32. Sub total pagar -->
+                            <tr style="background-color: #E8EDF2; font-weight: bold; border-bottom: 1px solid #eee;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">32</td>
+                                <td colspan="4" style="border-right: 1px solid #ddd; padding: 2px;">SUB TOTAL IMPUESTO A PAGAR</td>
+                                <td style="text-align: center; font-weight: bold; background-color: #e0e6ed; border-right: 1px solid #ddd; padding: 2px;">78</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(data['subtotal_pagar'])"/></td>
+                                <td style="text-align: center; padding: 2px;">2</td>
+                            </tr>
+                            <!-- 33. Retenciones acumuladas -->
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">33</td>
+                                <td colspan="4" style="border-right: 1px solid #ddd; padding: 2px;">RETENCIONES ACUMULADAS POR DESCONTAR</td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">64</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(o.retenciones_acumuladas)"/></td>
+                                <td style="text-align: center; padding: 2px;">6</td>
+                            </tr>
+                            <!-- 34. Retenciones periodo -->
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">34</td>
+                                <td colspan="4" style="border-right: 1px solid #ddd; padding: 2px;">RETENCIONES DEL PERIODO</td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">66</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(data['retenciones_periodo'])"/></td>
+                                <td style="text-align: center; padding: 2px;">4</td>
+                            </tr>
+                            <!-- 35. Cesion -->
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">35</td>
+                                <td colspan="4" style="border-right: 1px solid #ddd; padding: 2px;">CREDITOS ADQUIRIDOS POR CESION DE RETENCIONES</td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">72</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;">0,00</td>
+                                <td style="text-align: center; padding: 2px;">8</td>
+                            </tr>
+                            <!-- 36. Recuperacion -->
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">36</td>
+                                <td colspan="4" style="border-right: 1px solid #ddd; padding: 2px;">RECUPERACION DE RETENCIONES SOLICITADO</td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">73</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;">0,00</td>
+                                <td style="text-align: center; padding: 2px;">7</td>
+                            </tr>
+                            <!-- 37. Total retenciones -->
+                            <tr style="background-color: #E8EDF2; font-weight: bold; border-bottom: 1px solid #eee;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">37</td>
+                                <td colspan="4" style="border-right: 1px solid #ddd; padding: 2px;">TOTAL RETENCIONES</td>
+                                <td style="text-align: center; font-weight: bold; background-color: #e0e6ed; border-right: 1px solid #ddd; padding: 2px;">74</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(data['total_retenciones'])"/></td>
+                                <td style="text-align: center; padding: 2px;">6</td>
+                            </tr>
+                            <!-- 38. Retenciones soportadas/descontadas -->
+                            <tr style="background-color: #E8EDF2; font-weight: bold; border-bottom: 1px solid #eee;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">38</td>
+                                <td colspan="4" style="border-right: 1px solid #ddd; padding: 2px;">RETENCIONES SOPORTADAS Y DESCONTADAS EN ESTA DECLARACION</td>
+                                <td style="text-align: center; font-weight: bold; background-color: #e0e6ed; border-right: 1px solid #ddd; padding: 2px;">55</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(data['retenciones_descontadas'])"/></td>
+                                <td style="text-align: center; padding: 2px;">5</td>
+                            </tr>
+                            <!-- 39. Saldo retenciones no aplicado -->
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">39</td>
+                                <td colspan="4" style="border-right: 1px solid #ddd; padding: 2px;">SALDO DE RETENCIONES DE IVA NO APLICADO</td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">67</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(data['saldo_retenciones_no_aplicado'])"/></td>
+                                <td style="text-align: center; padding: 2px;">3</td>
+                            </tr>
+                            <!-- 40. Sub total pagar final -->
+                            <tr style="background-color: #E8EDF2; font-weight: bold; border-bottom: 1px solid #eee;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">40</td>
+                                <td colspan="4" style="border-right: 1px solid #ddd; padding: 2px;">SUB - TOTAL IMPUESTO A PAGAR</td>
+                                <td style="text-align: center; font-weight: bold; background-color: #e0e6ed; border-right: 1px solid #ddd; padding: 2px;">56</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;"><t t-esc="fmt(data['subtotal_impuesto_final'])"/></td>
+                                <td style="text-align: center; padding: 2px;">4</td>
+                            </tr>
+                            <!-- 41. Percepciones acumuladas -->
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">41</td>
+                                <td colspan="4" style="border-right: 1px solid #ddd; padding: 2px;">PERCEPCIONES ACUMULADAS POR DESCONTAR</td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">67</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;">0,00</td>
+                                <td style="text-align: center; padding: 2px;">3</td>
+                            </tr>
+                            <!-- 42. Percepciones periodo -->
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">42</td>
+                                <td colspan="4" style="border-right: 1px solid #ddd; padding: 2px;">PERCEPCIONES DEL PERIODO</td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">68</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;">0,00</td>
+                                <td style="text-align: center; padding: 2px;">2</td>
+                            </tr>
+                            <!-- 45. Total percepciones -->
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">45</td>
+                                <td colspan="4" style="border-right: 1px solid #ddd; padding: 2px;">TOTAL PERCEPCIONES</td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">77</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;">0,00</td>
+                                <td style="text-align: center; padding: 2px;">3</td>
+                            </tr>
+                            <!-- 46. Percepciones aduanas -->
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">46</td>
+                                <td colspan="4" style="border-right: 1px solid #ddd; padding: 2px;">PERCEPCIONES EN ADUANAS DESCONTADAS EN ESTA DECLARACION</td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">58</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;">0,00</td>
+                                <td style="text-align: center; padding: 2px;">2</td>
+                            </tr>
+                            <!-- 47. Saldo aduanas no aplicado -->
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="text-align: center; border-right: 1px solid #ddd; padding: 2px;">47</td>
+                                <td colspan="4" style="border-right: 1px solid #ddd; padding: 2px;">SALDO DE PERCEPCIONES EN ADUANAS NO APLICADO</td>
+                                <td style="text-align: center; font-weight: bold; background-color: #f9f9f9; border-right: 1px solid #ddd; padding: 2px;">-</td>
+                                <td style="text-align: right; border-right: 1px solid #ddd; padding: 2px;">0,00</td>
+                                <td style="text-align: center; padding: 2px;">1</td>
+                            </tr>
+                            <!-- 48. Total a pagar -->
+                            <tr style="background-color: #1B3A5C; color: white; font-weight: bold; font-size: 9px;">
+                                <td style="text-align: center; border-right: 1px solid #2C4D75; padding: 3px;">48</td>
+                                <td colspan="4" style="border-right: 1px solid #2C4D75; padding: 3px; font-size: 9px;">TOTAL A PAGAR</td>
+                                <td style="text-align: center; font-weight: bold; background-color: #2C4D75; border-right: 1px solid #2C4D75; padding: 3px;">90</td>
+                                <td style="text-align: right; border-right: 1px solid #2C4D75; padding: 3px;"><t t-esc="fmt(data['total_a_pagar'])"/></td>
+                                <td style="text-align: center; padding: 3px;">0</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div style="margin-top: 15px; font-size: 7px; color: #999; text-align: center; font-style: italic;">
+                        Este documento es un resumen de IVA oficial estructurado conforme al Formulario 30 de la declaración del SENIAT en la República Bolivariana de Venezuela.
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

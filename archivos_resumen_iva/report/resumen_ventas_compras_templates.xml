@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<template id="report_resumen_ventas_compras_template">
+    <t t-call="web.html_container">
+        <t t-foreach="docs" t-as="o">
+            <!-- Acumuladores de totales (igual que antes) -->
+            <t t-set="sales_data" t-value="o._get_sales_data()"/>
+            <t t-set="purchase_data" t-value="o._get_purchase_data()"/>
+            
+            <t t-set="total_ventas_gravadas_base" t-value="0.0"/>
+            <t t-set="total_ventas_gravadas_iva" t-value="0.0"/>
+            <t t-set="total_ventas_exentas" t-value="0.0"/>
+            <t t-set="total_ventas_exportacion" t-value="0.0"/>
+            <t t-set="total_compras_gravadas_base" t-value="0.0"/>
+            <t t-set="total_compras_gravadas_iva" t-value="0.0"/>
+            <t t-set="total_compras_exentas" t-value="0.0"/>
+            <t t-set="total_retenciones_iva" t-value="0.0"/>
+            
+            <t t-foreach="sales_data" t-as="l">
+                <t t-set="total_ventas_gravadas_base" t-value="total_ventas_gravadas_base + l.get('base_contrib', 0.0) + l.get('base_no_contrib', 0.0)"/>
+                <t t-set="total_ventas_gravadas_iva" t-value="total_ventas_gravadas_iva + l.get('iva_contrib', 0.0) + l.get('iva_no_contrib', 0.0)"/>
+                <t t-set="total_ventas_exentas" t-value="total_ventas_exentas + l.get('exempt', 0.0)"/>
+                <t t-set="total_ventas_exportacion" t-value="total_ventas_exportacion + l.get('export_base', 0.0)"/>
+            </t>
+            
+            <t t-foreach="purchase_data" t-as="l">
+                <t t-set="total_compras_gravadas_base" t-value="total_compras_gravadas_base + l.get('taxable_base', 0.0)"/>
+                <t t-set="total_compras_gravadas_iva" t-value="total_compras_gravadas_iva + l.get('iva_amount', 0.0)"/>
+                <t t-set="total_compras_exentas" t-value="total_compras_exentas + l.get('exempt_amount', 0.0)"/>
+                <t t-set="total_retenciones_iva" t-value="total_retenciones_iva + l.get('wh_amount', 0.0)"/>
+            </t>
+            
+            <div class="article" style="font-family: Arial, Helvetica, sans-serif; font-size: 9px; color: #000; width: 100%; margin: 0; padding: 0; page-break-after: avoid; page-break-inside: avoid;">
+                
+                <!-- ENCABEZADO compacto pero legible -->
+                <div style="width:100%; overflow:hidden; margin-bottom: 4px; border-bottom: 1px solid #1a1a2e; padding-bottom: 2px;">
+                    <div style="float:left; width:55%;">
+                        <div style="font-weight:900; font-size: 13px; text-transform:uppercase;">
+                            <t t-esc="o.company_id.name"/>
+                        </div>
+                        <div style="font-size: 7px; margin-top: 1px;">
+                            <t t-esc="o.company_id.street"/>
+                            <t t-if="o.company_id.street2"> - <t t-esc="o.company_id.street2"/></t><br/>
+                            <t t-esc="o.company_id.city or ''"/> - <t t-esc="o.company_id.state_id.name or ''"/><br/>
+                            <strong>RIF: <t t-esc="o.company_id.vat"/></strong>
+                        </div>
+                    </div>
+                    <div style="float:right; width:44%; text-align:right;">
+                        <div style="font-weight:900; font-size: 14px; text-transform:uppercase; color:#1a1a2e;">
+                            RESUMEN DE IVA - FORM.30
+                        </div>
+                        <div style="font-size: 7px; margin-top: 1px;">
+                            PERÍODO: <strong><span t-field="o.date_from" t-options='{"widget": "date", "format": "dd/MM/yyyy"}'/></strong> al <strong><span t-field="o.date_to" t-options='{"widget": "date", "format": "dd/MM/yyyy"}'/></strong>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- DÉBITOS FISCALES (sin margen inferior excesivo) -->
+                <div style="margin-bottom: 2px;">
+                    <div style="font-weight:bold; font-size: 9px; background-color:#1a1a2e; color:#fff; padding: 2px 5px;">DÉBITOS FISCALES</div>
+                </div>
+                <table style="width:100%; border-collapse:collapse; font-size: 8px; border:1px solid #aaa; margin-bottom: 2px;">
+                    <thead>
+                        <tr style="background-color:#e0e0e0; font-weight:bold;">
+                            <th style="width:4%; padding: 2px;">#</th>
+                            <th style="width:42%; text-align:left; padding: 2px;">Descripción</th>
+                            <th style="width:8%; padding: 2px;">Cas.B</th>
+                            <th style="width:14%; padding: 2px;">Base Imponible</th>
+                            <th style="width:6%; padding: 2px;">%</th>
+                            <th style="width:8%; padding: 2px;">Cas.I</th>
+                            <th style="width:12%; padding: 2px;">Débito Fiscal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- filas igual que antes, sin cambios -->
+                        <tr><td style="text-align:center; padding: 1px;">1</td><td style="padding: 1px;">VENTAS INTERNAS NO GRAVADAS</td><td style="text-align:center;">40</td><td style="text-align:right;"><t t-esc="'{:,.2f}'.format(total_ventas_exentas).replace(',','X').replace('.',',').replace('X','.')"/></td><td style="text-align:center;">0,00</td><td style="text-align:center;">-</td><td style="text-align:right;">0,00</td></tr>
+                        <tr><td style="text-align:center; padding: 1px;">2</td><td style="padding: 1px;">VENTAS DE EXPORTACION</td><td style="text-align:center;">41</td><td style="text-align:right;"><t t-esc="'{:,.2f}'.format(total_ventas_exportacion).replace(',','X').replace('.',',').replace('X','.')"/></td><td style="text-align:center;">0,00</td><td style="text-align:center;">-</td><td style="text-align:right;">0,00</td></tr>
+                        <tr><td style="text-align:center; padding: 1px;">3</td><td style="padding: 1px;">VENTAS INTERNAS GRAVADAS ALÍCUOTA GENERAL</td><td style="text-align:center;">42</td><td style="text-align:right;"><t t-esc="'{:,.2f}'.format(total_ventas_gravadas_base).replace(',','X').replace('.',',').replace('X','.')"/></td><td style="text-align:center;">16</td><td style="text-align:center;">43</td><td style="text-align:right;"><t t-esc="'{:,.2f}'.format(total_ventas_gravadas_iva).replace(',','X').replace('.',',').replace('X','.')"/></td></tr>
+                        <tr><td style="text-align:center; padding: 1px;">4</td><td style="padding: 1px;">VENTAS GRAVADAS ALÍCUOTA GRAL + ADICIONAL</td><td style="text-align:center;">44</td><td style="text-align:right;">0,00</td><td style="text-align:center;">31</td><td style="text-align:center;">45</td><td style="text-align:right;">0,00</td></tr>
+                        <tr><td style="text-align:center; padding: 1px;">5</td><td style="padding: 1px;">VENTAS INTERNAS GRAVADAS ALÍCUOTA REDUCIDA</td><td style="text-align:center;">442</td><td style="text-align:right;">0,00</td><td style="text-align:center;">8</td><td style="text-align:center;">443</td><td style="text-align:right;">0,00</td></tr>
+                        <tr style="background-color:#f5f5f5; font-weight:bold;"><td style="text-align:center; padding: 1px;">6</td><td style="padding: 1px;">TOTAL VENTAS Y DÉBITOS FISCALES</td><td style="text-align:center;">46</td><td style="text-align:right;"><t t-esc="'{:,.2f}'.format(total_ventas_gravadas_base + total_ventas_exentas + total_ventas_exportacion).replace(',','X').replace('.',',').replace('X','.')"/></td><td style="text-align:center;"></td><td style="text-align:center;">47</td><td style="text-align:right;"><t t-esc="'{:,.2f}'.format(total_ventas_gravadas_iva).replace(',','X').replace('.',',').replace('X','.')"/></td></tr>
+                        <tr><td style="text-align:center; padding: 1px;">7</td><td style="padding: 1px;">AJUSTE A DÉBITOS FISCALES PERIODOS ANTERIORES</td><td style="text-align:center;">48</td><td style="text-align:right;">0,00</td><td style="text-align:center;"></td><td style="text-align:center;">-</td><td style="text-align:right;">0,00</td></tr>
+                        <tr><td style="text-align:center; padding: 1px;">8</td><td style="padding: 1px;">CERTIF. DÉBITOS EXONERADOS RECIBIDOS</td><td style="text-align:center;">50</td><td style="text-align:right;">0,00</td><td style="text-align:center;"></td><td style="text-align:center;">-</td><td style="text-align:right;">0,00</td></tr>
+                        <tr style="border-top:1px solid #000; background-color:#e8e8e8; font-weight:bold;"><td style="text-align:center; padding: 2px;">9</td><td style="padding: 2px;">TOTAL DÉBITOS FISCALES</td><td style="text-align:center;">-</td><td style="text-align:right;"></td><td style="text-align:center;"></td><td style="text-align:center;">49</td><td style="text-align:right;"><t t-esc="'{:,.2f}'.format(total_ventas_gravadas_iva).replace(',','X').replace('.',',').replace('X','.')"/></td></tr>
+                    </tbody>
+                </table>
+                
+                <!-- CRÉDITOS FISCALES (margin-top reducido a 0) -->
+                <div style="margin-top: 0px; margin-bottom: 2px;">
+                    <div style="font-weight:bold; font-size: 9px; background-color:#1a1a2e; color:#fff; padding: 2px 5px;">CRÉDITOS FISCALES</div>
+                </div>
+                <table style="width:100%; border-collapse:collapse; font-size: 8px; border:1px solid #aaa; margin-bottom: 2px;">
+                    <thead>
+                        <tr style="background-color:#e0e0e0; font-weight:bold;">
+                            <th style="width:4%; padding: 2px;">#</th>
+                            <th style="width:42%; text-align:left; padding: 2px;">Descripción</th>
+                            <th style="width:8%; padding: 2px;">Cas.B</th>
+                            <th style="width:14%; padding: 2px;">Base Imponible</th>
+                            <th style="width:6%; padding: 2px;">%</th>
+                            <th style="width:8%; padding: 2px;">Cas.I</th>
+                            <th style="width:12%; padding: 2px;">Crédito Fiscal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td style="text-align:center; padding: 1px;">10</td><td style="padding: 1px;">COMPRAS NO GRAVADAS SIN CRÉDITO</td><td style="text-align:center;">30</td><td style="text-align:right;"><t t-esc="'{:,.2f}'.format(total_compras_exentas).replace(',','X').replace('.',',').replace('X','.')"/></td><td style="text-align:center;">0,00</td><td style="text-align:center;"></td><td style="text-align:right;">0,00</td></tr>
+                        <tr><td style="text-align:center; padding: 1px;">11</td><td style="padding: 1px;">IMPORTACIÓN ALÍCUOTA GENERAL</td><td style="text-align:center;">31</td><td style="text-align:right;">0,00</td><td style="text-align:center;">16</td><td style="text-align:center;">32</td><td style="text-align:right;">0,00</td></tr>
+                        <tr><td style="text-align:center; padding: 1px;">12</td><td style="padding: 1px;">IMPORTACIÓN GRAL + ADICIONAL</td><td style="text-align:center;">310</td><td style="text-align:right;">0,00</td><td style="text-align:center;">31</td><td style="text-align:center;">320</td><td style="text-align:right;">0,00</td></tr>
+                        <tr><td style="text-align:center; padding: 1px;">13</td><td style="padding: 1px;">IMPORTACIÓN ALÍCUOTA REDUCIDA</td><td style="text-align:center;">312</td><td style="text-align:right;">0,00</td><td style="text-align:center;">8</td><td style="text-align:center;">322</td><td style="text-align:right;">0,00</td></tr>
+                        <tr><td style="text-align:center; padding: 1px;">14</td><td style="padding: 1px;">COMPRAS INTERNAS ALÍCUOTA GENERAL</td><td style="text-align:center;">33</td><td style="text-align:right;"><t t-esc="'{:,.2f}'.format(total_compras_gravadas_base).replace(',','X').replace('.',',').replace('X','.')"/></td><td style="text-align:center;">16</td><td style="text-align:center;">34</td><td style="text-align:right;"><t t-esc="'{:,.2f}'.format(total_compras_gravadas_iva).replace(',','X').replace('.',',').replace('X','.')"/></td></tr>
+                        <tr><td style="text-align:center; padding: 1px;">15</td><td style="padding: 1px;">COMPRAS GRAL + ADICIONAL</td><td style="text-align:center;">330</td><td style="text-align:right;">0,00</td><td style="text-align:center;">31</td><td style="text-align:center;">340</td><td style="text-align:right;">0,00</td></tr>
+                        <tr><td style="text-align:center; padding: 1px;">16</td><td style="padding: 1px;">COMPRAS ALÍCUOTA REDUCIDA</td><td style="text-align:center;">332</td><td style="text-align:right;">0,00</td><td style="text-align:center;">8</td><td style="text-align:center;">342</td><td style="text-align:right;">0,00</td></tr>
+                        <tr style="background-color:#f5f5f5; font-weight:bold;"><td style="text-align:center; padding: 1px;">17</td><td style="padding: 1px;">TOTAL COMPRAS Y CRÉDITOS DEL PERIODO</td><td style="text-align:center;">35</td><td style="text-align:right;"><t t-esc="'{:,.2f}'.format(total_compras_gravadas_base + total_compras_exentas).replace(',','X').replace('.',',').replace('X','.')"/></td><td style="text-align:center;"></td><td style="text-align:center;">36</td><td style="text-align:right;"><t t-esc="'{:,.2f}'.format(total_compras_gravadas_iva).replace(',','X').replace('.',',').replace('X','.')"/></td></tr>
+                        <tr><td style="text-align:center; padding: 1px;">18</td><td style="padding: 1px;">CRÉDITOS TOTALMENTE DEDUCIBLES</td><td style="text-align:center;">70</td><td style="text-align:right;"></td><td style="text-align:center;"></td><td style="text-align:center;">-</td><td style="text-align:right;"><t t-esc="'{:,.2f}'.format(total_compras_gravadas_iva).replace(',','X').replace('.',',').replace('X','.')"/></td></tr>
+                        <tr><td style="text-align:center; padding: 1px;">19</td><td style="padding: 1px;">CRÉDITOS PRORRATA</td><td style="text-align:center;">37</td><td style="text-align:right;">0,00</td><td style="text-align:center;"></td><td style="text-align:center;">-</td><td style="text-align:right;">0,00</td></tr>
+                        <tr><td style="text-align:center; padding: 1px;">20</td><td style="padding: 1px;">TOTAL CRÉDITOS DEDUCIBLES</td><td style="text-align:center;">71</td><td style="text-align:right;"></td><td style="text-align:center;"></td><td style="text-align:center;">-</td><td style="text-align:right;"><t t-esc="'{:,.2f}'.format(total_compras_gravadas_iva).replace(',','X').replace('.',',').replace('X','.')"/></td></tr>
+                        <tr><td style="text-align:center; padding: 1px;">21</td><td style="padding: 1px;">EXCEDENTE CRÉDITOS MES ANTERIOR</td><td style="text-align:center;">38</td><td style="text-align:right;">0,00</td><td style="text-align:center;"></td><td style="text-align:center;">-</td><td style="text-align:right;">0,00</td></tr>
+                        <tr><td style="text-align:center; padding: 1px;">22</td><td style="padding: 1px;">REINTEGRO EXPORTADORES</td><td style="text-align:center;">21</td><td style="text-align:right;">0,00</td><td style="text-align:center;"></td><td style="text-align:center;">-</td><td style="text-align:right;">0,00</td></tr>
+                        <tr><td style="text-align:center; padding: 1px;">23</td><td style="padding: 1px;">REINTEGRO ENTES EXONERADOS</td><td style="text-align:center;">81</td><td style="text-align:right;">0,00</td><td style="text-align:center;"></td><td style="text-align:center;">-</td><td style="text-align:right;">0,00</td></tr>
+                        <tr><td style="text-align:center; padding: 1px;">24</td><td style="padding: 1px;">AJUSTES CRÉDITOS PERIODOS ANTERIORES</td><td style="text-align:center;">380</td><td style="text-align:right;">0,00</td><td style="text-align:center;"></td><td style="text-align:center;">-</td><td style="text-align:right;">0,00</td></tr>
+                        <tr><td style="text-align:center; padding: 1px;">25</td><td style="padding: 1px;">CERTIF. DÉBITOS EXONERADOS EMITIDOS</td><td style="text-align:center;">82</td><td style="text-align:right;">0,00</td><td style="text-align:center;"></td><td style="text-align:center;">-</td><td style="text-align:right;">0,00</td></tr>
+                        <tr style="border-top:1px solid #000; background-color:#e8e8e8; font-weight:bold;"><td style="text-align:center; padding: 2px;">26</td><td style="padding: 2px;">TOTAL CRÉDITOS FISCALES</td><td style="text-align:center;">-</td><td style="text-align:right;"></td><td style="text-align:center;"></td><td style="text-align:center;">39</td><td style="text-align:right;"><t t-esc="'{:,.2f}'.format(total_compras_gravadas_iva).replace(',','X').replace('.',',').replace('X','.')"/></td></tr>
+                    </tbody>
+                </table>
+                
+                <!-- AUTOLIQUIDACIÓN (márgenes mínimos) -->
+                <div style="margin-top: 2px; margin-bottom: 2px;">
+                    <div style="font-weight:bold; font-size: 9px; background-color:#1a1a2e; color:#fff; padding: 2px 5px;">AUTOLIQUIDACIÓN</div>
+                </div>
+                <table style="width:100%; border-collapse:collapse; font-size: 8px; border:1px solid #aaa;">
+                    <thead>
+                        <tr style="background-color:#e0e0e0; font-weight:bold;">
+                            <th style="width:5%; padding: 2px;">#</th>
+                            <th style="width:65%; text-align:left; padding: 2px;">Descripción</th>
+                            <th style="width:15%; padding: 2px;">Casilla</th>
+                            <th style="width:15%; padding: 2px;">Monto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td style="text-align:center; padding: 1px;">27</td><td style="padding: 1px;">TOTAL CUOTA TRIBUTARIA</td><td style="text-align:center;">53</td><td style="text-align:right;"><t t-esc="'{:,.2f}'.format(max(total_ventas_gravadas_iva - total_compras_gravadas_iva, 0.0)).replace(',','X').replace('.',',').replace('X','.')"/></td></tr>
+                        <tr><td style="text-align:center; padding: 1px;">28</td><td style="padding: 1px;">EXCEDENTE CRÉDITO FISCAL PARA EL MES SIGUIENTE</td><td style="text-align:center;">60</td><td style="text-align:right;"><t t-esc="'{:,.2f}'.format(max(total_compras_gravadas_iva - total_ventas_gravadas_iva, 0.0)).replace(',','X').replace('.',',').replace('X','.')"/></td></tr>
+                        <tr><td style="text-align:center; padding: 1px;">29</td><td style="padding: 1px;">IMPUESTO PAGADO DECLARACIÓN SUSTITUIDA</td><td style="text-align:center;">22</td><td style="text-align:right;">0,00</td></tr>
+                        <tr><td style="text-align:center; padding: 1px;">30</td><td style="padding: 1px;">RETENCIONES DESCONTADAS EN DECLARACIÓN SUSTITUIDA</td><td style="text-align:center;">61</td><td style="text-align:right;">0,00</td></tr>
+                        <tr><td style="text-align:center; padding: 1px;">31</td><td style="padding: 1px;">PERCEPCIONES DESCONTADAS EN DECLARACIÓN SUSTITUIDA</td><td style="text-align:center;">24</td><td style="text-align:right;">0,00</td></tr>
+                        <tr><td style="text-align:center; padding: 1px;">32</td><td style="padding: 1px;">SUB TOTAL IMPUESTO A PAGAR</td><td style="text-align:center;">78</td><td style="text-align:right;"><t t-esc="'{:,.2f}'.format(max(total_ventas_gravadas_iva - total_compras_gravadas_iva, 0.0)).replace(',','X').replace('.',',').replace('X','.')"/></td></tr>
+                        <tr><td style="text-align:center; padding: 1px;">33</td><td style="padding: 1px;">RETENCIONES ACUMULADAS POR DESCONTAR</td><td style="text-align:center;">64</td><td style="text-align:right;">0,00</td></tr>
+                        <tr><td style="text-align:center; padding: 1px;">34</td><td style="padding: 1px;">RETENCIONES DEL PERIODO</td><td style="text-align:center;">66</td><td style="text-align:right;"><t t-esc="'{:,.2f}'.format(total_retenciones_iva).replace(',','X').replace('.',',').replace('X','.')"/></td></tr>
+                        <tr><td style="text-align:center; padding: 1px;">35</td><td style="padding: 1px;">CRÉDITOS ADQUIRIDOS POR CESION DE RETENCIONES</td><td style="text-align:center;">72</td><td style="text-align:right;">0,00</td></tr>
+                        <tr><td style="text-align:center; padding: 1px;">36</td><td style="padding: 1px;">RECUPERACIÓN DE RETENCIONES SOLICITADO</td><td style="text-align:center;">73</td><td style="text-align:right;">0,00</td></tr>
+                        <tr><td style="text-align:center; padding: 1px;">37</td><td style="padding: 1px;">TOTAL RETENCIONES</td><td style="text-align:center;">74</td><td style="text-align:right;"><t t-esc="'{:,.2f}'.format(total_retenciones_iva).replace(',','X').replace('.',',').replace('X','.')"/></td></tr>
+                        <tr><td style="text-align:center; padding: 1px;">38</td><td style="padding: 1px;">RETENCIONES SOPORTADAS Y DESCONTADAS</td><td style="text-align:center;">55</td><td style="text-align:right;">0,00</td></tr>
+                        <tr><td style="text-align:center; padding: 1px;">39</td><td style="padding: 1px;">SALDO DE RETENCIONES DE IVA NO APLICADO</td><td style="text-align:center;">67</td><td style="text-align:right;">0,00</td></tr>
+                        <tr><td style="text-align:center; padding: 1px;">40</td><td style="padding: 1px;">SUB - TOTAL IMPUESTO A PAGAR</td><td style="text-align:center;">56</td><td style="text-align:right;"><t t-esc="'{:,.2f}'.format(max(total_ventas_gravadas_iva - total_compras_gravadas_iva, 0.0)).replace(',','X').replace('.',',').replace('X','.')"/></td></tr>
+                        <tr><td style="text-align:center; padding: 1px;">41</td><td style="padding: 1px;">PERCEPCIONES ACUMULADAS POR DESCONTAR</td><td style="text-align:center;">67</td><td style="text-align:right;">0,00</td></tr>
+                        <tr><td style="text-align:center; padding: 1px;">42</td><td style="padding: 1px;">PERCEPCIONES DEL PERIODO</td><td style="text-align:center;">68</td><td style="text-align:right;">0,00</td></tr>
+                        <tr><td style="text-align:center; padding: 1px;">45</td><td style="padding: 1px;">TOTAL PERCEPCIONES</td><td style="text-align:center;">77</td><td style="text-align:right;">0,00</td></tr>
+                        <tr><td style="text-align:center; padding: 1px;">46</td><td style="padding: 1px;">PERCEPCIONES EN ADUANAS DESCONTADAS</td><td style="text-align:center;">58</td><td style="text-align:right;">0,00</td></tr>
+                        <tr><td style="text-align:center; padding: 1px;">47</td><td style="padding: 1px;">SALDO DE PERCEPCIONES EN ADUANAS NO APLICADO</td><td style="text-align:center;">-</td><td style="text-align:right;">0,00</td></tr>
+                        <tr style="border-top:1px solid #000; background-color:#e8e8e8; font-weight:bold;"><td style="text-align:center; padding: 2px;">48</td><td style="padding: 2px;">TOTAL A PAGAR</td><td style="text-align:center;">90</td><td style="text-align:right;"><t t-esc="'{:,.2f}'.format(max(total_ventas_gravadas_iva - total_compras_gravadas_iva, 0.0)).replace(',','X').replace('.',',').replace('X','.')"/></td></tr>
+                    </tbody>
+                </table>
+                
+                <div style="margin-top: 4px; font-size: 6px; text-align:center; color:#555;">
+                    Documento válido como Resumen de IVA - Formulario 30 SENIAT. Generado: <span t-esc="datetime.datetime.now().strftime('%d/%m/%Y %H:%M:%S')"/>
+                </div>
+            </div>
+        </t>
+    </t>
+</template>
+</odoo>

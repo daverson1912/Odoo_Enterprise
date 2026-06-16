@@ -1,0 +1,26 @@
+# Virtual Environment
+V18-ENTERPRICE/venv/
+venv/
+.venv/
+Env/
+env/
+
+# Logs
+*.log
+V18-ENTERPRICE/*.log
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# OS specific files
+.DS_Store
+Thumbs.db
+desktop.ini
+*.lnk
+
+# Odoo specific
+filestore/
+sessions/
