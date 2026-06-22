@@ -23,7 +23,7 @@
                     <div style="font-weight: bold;">R.I.F. No.: <t t-esc="o.company_id.vat"/></div>
                     <div style="font-weight: bold;">DIRECCIÓN FISCAL: <t t-esc="o.company_id.street"/> <t t-esc="o.company_id.city"/></div>
                     <br/>
-                 <div style="font-weight: bold; font-size: 10px; text-align: center;">
+                    <div style="font-weight: bold; font-size: 10px; text-align: center;">
                             LIBRO DE VENTAS CORRESPONDIENTE AL PERIODO <t t-esc="o.date_from.strftime('%m')"/> Año: <t t-esc="o.date_from.strftime('%Y')"/>
                       </div>
                 </div>
