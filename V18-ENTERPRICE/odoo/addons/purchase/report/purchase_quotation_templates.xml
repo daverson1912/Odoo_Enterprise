@@ -38,7 +38,7 @@
             <!-- TÍTULO Y R.I.F. ALINEADOS A LA ESQUINA SUPERIOR IZQUIERDA -->
             <div class="row mb-4">
                 <div class="col-12 text-start">
-                    <h2 style="color: #f1c40f; font-weight: bold; margin: 0; margin-bottom: 5px;">Solicitud de cotización <span t-field="o.name"/></h2>
+                    <h2 style="color: #714B67; font-weight: bold; margin: 0; margin-bottom: 5px;">Solicitud de cotización <span t-field="o.name"/></h2>
                     <strong style="font-size: 14px;">R.I.F. de la Empresa:</strong> 
                     <span style="font-size: 14px;" t-field="o.company_id.vat"/>
                 </div>
