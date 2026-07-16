@@ -3,106 +3,84 @@
 <template id="report_purchasequotation_document">
     <t t-call="web.external_layout">
         <t t-set="o" t-value="o.with_context(lang=o.partner_id.lang)"/>
-        <t t-set="forced_vat" t-value="o.fiscal_position_id.foreign_vat"/> 
-        
-        <!-- ESTILOS PARA OCULTAR LA DIRECCIÓN NATIVA DEL ENCABEZADO DE ODOO -->
-        <style>
-            div[name="company_address"] { display: none !important; }
-            .company_address { display: none !important; }
-        </style>
-
-        <!-- ETIQUETAS ORIGINALES OCULTAS DE FORMA SEGURA (Evita que Odoo las imprima o dé error) -->
-        <t t-set="address">
-            <div style="display: none !important;">
-                <div t-field="o.partner_id" t-options='{"widget": "contact", "fields": ["address", "name", "phone", "vat"], "no_marker": True, "phone_icons": True}'/>
-            </div>
-        </t>
-        
+        <t t-set="forced_vat" t-value="o.fiscal_position_id.foreign_vat"/> <!-- So that it appears in the footer of the report instead of the company VAT if it's set -->
+        <t t-set="address"/>
         <t t-if="o.dest_address_id">
             <t t-set="information_block">
-                <div style="display: none !important;">
-                    <strong class="d-block mt-3">Shipping address:</strong>
-                    <div t-field="o.dest_address_id" t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True, "phone_icons": True}' name="purchase_shipping_address"/>
-                </div>
+                <strong class="d-block mt-3">Shipping address:</strong>
+                <div t-field="o.dest_address_id"
+                    t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True, "phone_icons": True}' name="purchase_shipping_address"/>
             </t>
         </t>
-        
         <div class="page">
             <div class="oe_structure"/>
-            
-            <!-- TÍTULO NATIVO OCULTO -->
             <t t-set="layout_document_title">
-                <span style="display: none !important;">Request for Quotation <span t-field="o.name"/></span>
+                <!-- Título Traducido -->
+                <h2 class="mt-3 mb-4">
+                    <span>Solicitud de cotización </span>
+                    <span t-field="o.name"/>
+                </h2>
+
+                <!-- Cuadro Superior con Dirección de Envío -->
+                <div class="row mb-4 mt-3" style="font-size: 13px;">
+                    <!-- Columna Izquierda: Empresa y Datos de Envío -->
+                    <div class="col-6">
+                        <strong>RIF de la Empresa:</strong> <span t-field="o.company_id.vat"/><br/>
+                        <strong>Nombre de la Tienda:</strong> 
+                        <t t-if="o.dest_address_id">
+                            <span t-field="o.dest_address_id.name"/>
+                        </t>
+                        <t t-else="">
+                            <span t-field="o.company_id.name"/>
+                        </t>
+                        <br/>
+                        <strong>Fecha de Emisión:</strong> <span t-field="o.date_order" t-options='{"widget": "date"}'/><br/>
+                        
+                        <!-- Dirección de envío y teléfono -->
+                        <div class="mt-2">
+                            <strong>Dirección de Envío:</strong><br/>
+                            <t t-if="o.dest_address_id">
+                                <span t-field="o.dest_address_id" t-options='{"widget": "contact", "fields": ["address", "phone"], "no_marker": True}'/>
+                            </t>
+                            <t t-else="">
+                                <span t-field="o.company_id.partner_id" t-options='{"widget": "contact", "fields": ["address", "phone"], "no_marker": True}'/>
+                            </t>
+                        </div>
+                    </div>
+                    
+                    <!-- Columna Derecha: Proveedor -->
+                    <div class="col-6 text-end">
+                        <strong>Proveedor:</strong> <span t-field="o.partner_id.name"/><br/>
+                        <strong>RIF Proveedor:</strong> <span t-field="o.partner_id.vat"/><br/>
+                        <strong>Teléfono:</strong> <span t-field="o.partner_id.phone"/><br/>
+                        <strong>Dirección:</strong> <span t-field="o.partner_id" t-options='{"widget": "contact", "fields": ["address"], "no_marker": True}'/>
+                    </div>
+                </div>
             </t>
 
-            <!-- TÍTULO Y R.I.F. ALINEADOS A LA ESQUINA SUPERIOR IZQUIERDA -->
-            <div class="row mb-4">
-                <div class="col-12 text-start">
-                    <h2 style="color: #714B67; font-weight: bold; margin: 0; margin-bottom: 5px;">Solicitud de cotización <span t-field="o.name"/></h2>
-                    <strong style="font-size: 14px;">R.I.F. de la Empresa:</strong> 
-                    <span style="font-size: 14px;" t-field="o.company_id.vat"/>
-                </div>
-            </div>
-
-            <!-- DIRECCIONES 100% ALINEADAS (Envío a la izq, Proveedor a la der) -->
-            <div class="row mt-2 mb-4">
-                <div class="col-6">
-                    <strong class="d-block mb-1" style="color: #555;">DIRECCIÓN DE ENVÍO</strong>
-                    <div t-if="o.dest_address_id">
-                        <div t-field="o.dest_address_id" t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True, "phone_icons": True}'/>
-                    </div>
-                    <div t-else="">
-                        <div t-field="o.company_id.partner_id" t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True, "phone_icons": True}'/>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <strong class="d-block mb-1" style="color: #555;">PROVEEDOR</strong>
-                    <div t-field="o.partner_id" t-options='{"widget": "contact", "fields": ["address", "name", "phone", "vat"], "no_marker": True, "phone_icons": True}'/>
-                </div>
-            </div>
-
-            <!-- BLOQUE DE FECHAS -->
-            <div class="row mb-4" style="background-color: #f9f9f9; padding: 10px; border-radius: 5px;">
-                <div class="col-6">
-                    <strong>Fecha de Emisión: </strong>
-                    <span t-out="o.date_order" t-options='{"widget": "date"}'/>
-                </div>
-                <div class="col-6 text-end">
-                    <strong>Fecha de Vencimiento: </strong>
-                    <span t-out="o.date_planned" t-options='{"widget": "date"}'/>
-                </div>
-            </div>
-
-            <!-- TABLA DE ARTÍCULOS CON COLUMNAS SEPARADAS -->
             <table class="table table-borderless">
-                <thead style="display: table-row-group; border-bottom: 2px solid #ccc;">
+                <thead style="display: table-row-group">
                     <tr>
-                        <th name="th_code" style="width: 15%;"><strong>Código</strong></th>
-                        <th name="th_description"><strong>Descripción</strong></th>
-                        <th name="th_expected_date" class="text-center"><strong>Fecha prevista</strong></th>
-                        <th name="th_quantity" class="text-end"><strong>Cant.</strong></th>
+                        <th name="th_code" class="text-start"><strong>Código</strong></th>
+                        <th name="th_description" class="text-start"><strong>Descripción</strong></th>
+                        <th name="th_expected_date" class="text-center"><strong>Fecha Prevista</strong></th>
+                        <th name="th_quantity" class="text-end"><strong>Cantidad</strong></th>
                     </tr>
                 </thead>
                 <tbody>
                     <t t-foreach="o.order_line" t-as="order_line">
                         <tr t-att-class="'fw-bold o_line_section' if order_line.display_type == 'line_section' else 'fst-italic o_line_note' if order_line.display_type == 'line_note' else ''">
                             <t t-if="not order_line.display_type">
-                                
-                                <!-- CELDA PARA EL CÓDIGO -->
-                                <td id="product_code" style="border-bottom: 1px solid #eee;">
+                                <td>
                                     <span t-field="order_line.product_id.default_code"/>
                                 </td>
-                                
-                                <!-- CELDA PARA LA DESCRIPCIÓN (Limpia el código duplicado) -->
-                                <td id="product_desc" style="border-bottom: 1px solid #eee;">
-                                    <t t-set="code_prefix" t-value="'[' + str(order_line.product_id.default_code or '') + '] '"/>
-                                    <span t-out="order_line.name.replace(code_prefix, '', 1) if order_line.product_id.default_code and order_line.name.startswith(code_prefix) else order_line.name"/>
+                                <td id="product">
+                                    <span t-field="order_line.product_id.name"/>
                                 </td>
-                                
-                                <td class="text-center" style="border-bottom: 1px solid #eee;">
-                                    <span t-field="order_line.date_planned" t-options='{"widget": "date"}'/>
+                                <td class="text-center">
+                                    <span t-field="order_line.date_planned"/>
                                 </td>
-                                <td class="text-end" style="border-bottom: 1px solid #eee;">
+                                <td class="text-end">
                                     <span t-field="order_line.product_qty"/>
                                     <span t-field="order_line.product_uom" groups="uom.group_uom"/>
                                     <span t-if="order_line.product_packaging_id">
@@ -120,7 +98,6 @@
                 </tbody>
             </table>
 
-            <p t-field="o.notes" class="mt-4"/>
 
             <div class="oe_structure"/>
 

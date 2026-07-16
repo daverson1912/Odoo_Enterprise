@@ -3,64 +3,85 @@
 <template id="report_purchaseorder_document">
     <t t-call="web.external_layout">
         <t t-set="o" t-value="o.with_context(lang=o.partner_id.lang)"/>
-        <t t-set="address">
-            <div t-field="o.partner_id"
-                 t-options='{"widget": "contact", "fields": ["address", "name", "phone", "vat"], "no_marker": True, "phone_icons": True}'/>
-        </t>
+        <t t-set="forced_vat" t-value="o.fiscal_position_id.foreign_vat"/>
+        <t t-set="address"/>
         <t t-if="o.dest_address_id">
             <t t-set="information_block">
-                <strong class="d-block mt-3">Shipping address</strong>
-                <div t-if="o.dest_address_id">
-                    <div t-field="o.dest_address_id"
-                        t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True, "phone_icons": True}' name="purchase_shipping_address"/>
-                </div>
-
+                <strong class="d-block mt-3">Shipping address:</strong>
+                <div t-field="o.dest_address_id"
+                    t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True, "phone_icons": True}' name="purchase_shipping_address"/>
             </t>
         </t>
         <div class="page">
             <div class="oe_structure"/>
-
-            <div class="mt-4">
-                <t t-set="layout_document_title">
-                    <t t-if="o.state in ['draft', 'sent', 'to approve']">Request for Quotation #<span t-field="o.name"/></t>
-                    <t t-if="o.state in ['purchase', 'done']">Purchase Order #<span t-field="o.name"/></t>
-                    <t t-if="o.state == 'cancel'">Cancelled Purchase Order #<span t-field="o.name"/></t>
-                </t>
+            <!-- CONTENEDOR PARA SATISFACER XPATHS DE MÓDULOS HEREDADOS (Evita que falle la actualización de Odoo) -->
+            <div style="display: none !important;">
+                <div t-if="o.date_planned"/>
             </div>
+            <t t-set="layout_document_title">
+                <!-- Título Traducido -->
+                <h2 class="mt-3 mb-4">
+                    <t t-if="o.state in ['draft', 'sent', 'to approve']"><span>Solicitud de cotización </span></t>
+                    <t t-if="o.state in ['purchase', 'done']"><span>Orden de compra </span></t>
+                    <t t-if="o.state == 'cancel'"><span>Orden de compra cancelada </span></t>
+                    <span t-field="o.name"/>
+                </h2>
 
-            <div id="informations" class="row mb-4">
-                <div t-if="o.user_id" class="col">
-                    <strong>Buyer</strong>
-                    <div t-field="o.user_id"/>
+                <!-- Cuadro Superior con Dirección de Envío -->
+                <div class="row mb-4 mt-3" style="font-size: 13px;">
+                    <!-- Columna Izquierda: Empresa y Datos de Envío -->
+                    <div class="col-6">
+                        <strong>RIF de la Empresa:</strong> <span t-field="o.company_id.vat"/><br/>
+                        <strong>Nombre de la Tienda:</strong> 
+                        <t t-if="o.dest_address_id">
+                            <span t-field="o.dest_address_id.name"/>
+                        </t>
+                        <t t-else="">
+                            <span t-field="o.company_id.name"/>
+                        </t>
+                        <br/>
+                        <strong>Fecha de Emisión:</strong>
+                        <t t-if="o.state in ['purchase','done'] and o.date_approve">
+                            <span t-field="o.date_approve" t-options='{"widget": "date"}'/>
+                        </t>
+                        <t t-else="">
+                            <span t-field="o.date_order" t-options='{"widget": "date"}'/>
+                        </t>
+                        <br/>
+                        
+                        <!-- Dirección de envío y teléfono -->
+                        <div class="mt-2">
+                            <strong>Dirección de Envío:</strong><br/>
+                            <t t-if="o.dest_address_id">
+                                <span t-field="o.dest_address_id" t-options='{"widget": "contact", "fields": ["address", "phone"], "no_marker": True}'/>
+                            </t>
+                            <t t-else="">
+                                <span t-field="o.company_id.partner_id" t-options='{"widget": "contact", "fields": ["address", "phone"], "no_marker": True}'/>
+                            </t>
+                        </div>
+                    </div>
+                    
+                    <!-- Columna Derecha: Proveedor -->
+                    <div class="col-6 text-end">
+                        <strong>Proveedor:</strong> <span t-field="o.partner_id.name"/><br/>
+                        <strong>RIF Proveedor:</strong> <span t-field="o.partner_id.vat"/><br/>
+                        <strong>Teléfono:</strong> <span t-field="o.partner_id.phone"/><br/>
+                        <strong>Dirección:</strong> <span t-field="o.partner_id" t-options='{"widget": "contact", "fields": ["address"], "no_marker": True}'/>
+                    </div>
                 </div>
-                <div t-if="o.partner_ref" class="col">
-                    <strong>Your Order Reference</strong>
-                    <div t-field="o.partner_ref"/>
-                </div>
-                <div t-if="o.state in ['purchase','done'] and o.date_approve" class="col-3 bm-2">
-                    <strong>Order Date:</strong>
-                    <p t-field="o.date_approve" t-options="{'date_only': 'true'}" class="m-0"/>
-                </div>
-                <div t-elif="o.date_order" class="col-2 bm-2">
-                    <strong>Order Deadline:</strong>
-                    <p t-field="o.date_order" t-options="{'date_only': 'true'}" class="m-0"/>
-                </div>
-                <div t-if="o.date_planned" class="col-2 bm-2">
-                    <strong>Expected Arrival:</strong>
-                    <p t-field="o.date_planned" t-options="{'date_only': 'true'}" class="m-0"/>
-                </div>
-            </div>
+            </t>
 
             <table class="o_has_total_table table o_main_table table-borderless">
                 <thead style="display: table-row-group">
                     <tr>
-                        <th name="th_description" class="text-start"><strong>Description</strong></th>
-                        <th name="th_quantity" class="text-end"><strong>Qty</strong></th>
-                        <th name="th_price_unit" class="text-end"><strong>Unit Price</strong></th>
-                        <th name="th_discount" class="text-end"><strong>Disc.</strong></th>
-                        <th name="th_taxes" class="text-end"><strong>Taxes</strong></th>
+                        <th name="th_code" class="text-start"><strong>Código</strong></th>
+                        <th name="th_description" class="text-start"><strong>Descripción</strong></th>
+                        <th name="th_quantity" class="text-end"><strong>Cantidad</strong></th>
+                        <th name="th_price_unit" class="text-end"><strong>Precio Unitario</strong></th>
+                        <th name="th_discount" class="text-end"><strong>Desc.</strong></th>
+                        <th name="th_taxes" class="text-end"><strong>Impuestos</strong></th>
                         <th name="th_subtotal" class="text-end">
-                            <strong>Amount</strong>
+                            <strong>Importe</strong>
                         </th>
                     </tr>
                 </thead>
@@ -71,8 +92,11 @@
 
                         <tr t-att-class="'fw-bold o_line_section' if line.display_type == 'line_section' else 'fst-italic o_line_note' if line.display_type == 'line_note' else ''">
                             <t t-if="not line.display_type">
+                                <td>
+                                    <span t-field="line.product_id.default_code"/>
+                                </td>
                                 <td id="product" class="text-start">
-                                    <span t-field="line.name"/>
+                                    <span t-field="line.product_id.name"/>
                                 </td>
                                 <td class="text-end">
                                     <span t-field="line.product_qty"/>
@@ -134,11 +158,33 @@
                 </div>
             </div>
 
-            <p t-field="o.notes" class="mt-4"/>
-            <div class="oe_structure"/>
+            <!-- Contenedor de Nota y Firmas al final de la página -->
+            <div style="page-break-inside: avoid; margin-top: 460px;">
+                <!-- Sección de Firmas -->
+                <div class="row pt-2">
+                    <div class="col-5 text-center">
+                        <div style="border-top: 1px solid black; width: 80%; margin: 0 auto;"/>
+                        <span style="font-size: 13px; font-weight: bold; display: block; margin-top: 5px;">Firma Elaborado</span>
+                    </div>
+                    <div class="col-2"/>
+                    <div class="col-5 text-center">
+                        <div style="border-top: 1px solid black; width: 80%; margin: 0 auto;"/>
+                        <span style="font-size: 13px; font-weight: bold; display: block; margin-top: 5px;">Firma Autorizado</span>
+                    </div>
+                </div>
 
-            <strong>Payment Terms: </strong>
-            <span t-field="o.payment_term_id" class="mt-4"></span>
+                <!-- Notas generales (si existen) -->
+                <div t-if="o.notes" style="font-size: 15px; margin-top: 20px;">
+                    <span t-field="o.notes"/>
+                </div>
+
+                <!-- Nota de plazos de pago (siempre visible) -->
+                <div style="font-size: 15px; margin-top: 25px;">
+                    <strong>Nota: </strong>
+                    <span t-field="o.payment_term_id"/>
+                </div>
+            </div>
+
 
             <t t-set="base_address" t-value="o.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
             <t t-set="portal_url" t-value="base_address + '/my/purchase/' + str(o.id) + '#portal_connect_software_modal'"/>
