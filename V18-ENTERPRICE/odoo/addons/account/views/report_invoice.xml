@@ -484,23 +484,7 @@
                                     <span t-field="o.narration"/>
                                 </div>
                             </div>
-                            <!-- Contenedor de Nota y Firmas al final de la página (solo para devolución de compras) -->
-                            <t t-if="o.move_type in ('in_invoice', 'in_refund')">
-                                <div style="page-break-inside: avoid; margin-top: 150px;">
-                                    <!-- Sección de Firmas -->
-                                    <div class="row pt-2">
-                                        <div class="col-5 text-center">
-                                            <div style="border-top: 1px solid black; width: 80%; margin: 0 auto;"/>
-                                            <span style="font-size: 13px; font-weight: bold; display: block; margin-top: 5px;">Firma Elaborado</span>
-                                        </div>
-                                        <div class="col-2"/>
-                                        <div class="col-5 text-center">
-                                            <div style="border-top: 1px solid black; width: 80%; margin: 0 auto;"/>
-                                            <span style="font-size: 13px; font-weight: bold; display: block; margin-top: 5px;">Firma Autorizado</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </t>
+
                         </div>
                     </div>
                 </div>
