@@ -126,10 +126,6 @@
                                     <strong>Fecha:</strong>
                                     <div t-field="o.invoice_date" t-options='{"widget": "date"}'/>
                                 </div>
-                                <div class="col" t-if="o.name" name="invoice_number">
-                                    <strong>Nro. Factura:</strong>
-                                    <div t-field="o.name"/>
-                                </div>
                                 <div class="col" t-if="o.l10n_ve_control_number" name="control_number">
                                     <strong>Nro. Control:</strong>
                                     <div t-field="o.l10n_ve_control_number"/>
