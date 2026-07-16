@@ -42,8 +42,7 @@
                         </div>
                     </div>
 
-                    <div class="oe_structure"></div>
-                    <div id="informations" class="report-wrapping-flexbox clearfix row mb-4" style="font-size: 13px;">
+                    <div id="informations" class="row mb-4" style="font-size: 13px;">
                         <div t-if="o.origin" class="col-6" name="div_origin">
                             <strong>Orden:</strong>
                             <div t-field="o.origin" class="m-0">S0001</div>
@@ -181,7 +180,7 @@
                                         <span t-field="bo_line.product_id.default_code"/>
                                     </td>
                                     <td class="w-auto">
-                                        <span t-field="bo_line.product_id">Office Chair</span>
+                                        <span t-field="bo_line.product_id.name"/>
                                         <p t-if="bo_line.description_picking and bo_line.description_picking != bo_line.product_id.name and bo_line.description_picking != bo_line.product_id.display_name">
                                             <span t-field="bo_line.description_picking">Description on transfer</span>
                                         </p>
@@ -220,7 +219,7 @@
             <span t-field="move_line.product_id.default_code"/>
         </td>
         <td>
-            <span t-field="move_line.product_id"/>
+            <span t-field="move_line.product_id.name"/>
             <!-- this is an annoying workaround for the multiple types of descriptions (often auto-filled) that we do not want to print -->
             <!-- this makes it so we can pre-filter the descriptions in inherited templates since we cannot extend the standard "if" condition -->
             <!-- let's agree that pre-filtered descriptions will be set to "" -->
@@ -251,7 +250,7 @@
                 <span t-esc="aggregated_lines[line]['product'].default_code"/>
             </td>
             <td>
-                <span t-esc="aggregated_lines[line]['name']"/>
+                <span t-esc="aggregated_lines[line]['product'].name"/>
                 <p t-if="aggregated_lines[line]['description']">
                     <span t-esc="aggregated_lines[line]['description']"  t-options="{'widget': 'text'}"/>
                 </p>
