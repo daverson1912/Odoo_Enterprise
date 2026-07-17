@@ -208,6 +208,26 @@
                         </div>
                     </div>
                 </div>
+                
+                <!-- Pie de página personalizado con Firmas y Paginación -->
+                <div class="footer" style="font-size: 13px;">
+                    <div class="row text-center mb-4">
+                        <div class="col-6">
+                            <div style="border-top: 1px solid black; width: 60%; margin: 0 auto;"/>
+                            <strong>ELABORADO POR</strong>
+                        </div>
+                        <div class="col-6">
+                            <div style="border-top: 1px solid black; width: 60%; margin: 0 auto;"/>
+                            <strong>RECIBIDO POR</strong>
+                        </div>
+                    </div>
+                    <div class="d-flex border-top pt-2">
+                        <div class="flex-grow-1 text-start me-2" t-field="o.company_id.report_footer"/>
+                        <div class="text-end text-muted text-nowrap">
+                            Página <span class="page"/> / <span class="topage"/>
+                        </div>
+                    </div>
+                </div>
             </t>
          </t>
     </template>
