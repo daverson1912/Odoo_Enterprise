@@ -4,7 +4,7 @@
         <t t-call="web.html_container">
             <t t-call="web.external_layout">
                 <t t-set="o" t-value="o.with_context(lang=o._get_report_lang())" />
-                <t t-set="partner" t-value="o.partner_id or (o.move_ids and o.move_ids[0].partner_id) or False"/>
+                <t t-set="partner" t-value="o.partner_id or (o.move_ids and o.move_ids[0].partner_id) or ('pos_order_id' in o._fields and o.pos_order_id and o.pos_order_id.partner_id) or False"/>
 
                 <t t-set="address"/>
                 <t t-set="information_block"/>
@@ -19,7 +19,7 @@
                             <strong>RIF de la Empresa:</strong> <span t-field="o.company_id.vat"/><br/>
                             <strong>Nombre de la Tienda:</strong> <span t-field="o.company_id.name"/><br/>
                             
-                            <!-- Dirección de envío y teléfono -->
+                            <!-- Dirección de la Tienda -->
                             <div class="mt-2 text-start">
                                 <strong>Dirección:</strong><br/>
                                 <span t-field="o.company_id.partner_id" t-options='{"widget": "contact", "fields": ["address", "phone"], "no_marker": True}'/>
