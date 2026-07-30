@@ -5,37 +5,40 @@
             <t t-set="o" t-value="o.with_context(lang=lang)"/>
             <t t-set="values" t-value="o._get_payment_receipt_report_values()"/>
             <div class="page">
-                <h3><strong><span t-field="o.payment_receipt_title">Payment Receipt</span>: <span t-field="o.name">INV0001</span></strong></h3>
+                <h3><strong><span>Recibo de Pago</span>: <span t-field="o.name">INV0001</span></strong></h3>
 
                 <div class="mb-4 mt-3">
                     <div name="date" class="row">
                         <div class="col-6" t-if="o.date">
-                            Payment Date: <span t-field="o.date">2023-01-01</span>
+                            Fecha de Pago: <span t-field="o.date">2023-01-01</span>
                         </div>
                     </div>
                     <div class="oe_structure"></div>
                     <div class="row">
                         <div class="col-6" t-if="o.partner_type">
                             <t t-if="o.partner_type == 'customer'">
-                                Customer:
+                                Cliente:
                             </t>
                             <t t-else="o.partner_type == 'supplier'">
-                                Vendor:
+                                Proveedor:
                             </t><span t-field="o.partner_id" data-oe-demo="Marc Demo"/>
+                            <t t-if="o.partner_id.vat">
+                                <br/><strong>RIF/CI:</strong> <span t-field="o.partner_id.vat"/>
+                            </t>
                         </div>
                         <div name="payment_method"
                              t-if="values['display_payment_method'] and o.payment_method_id"
                              class="col-6">
-                            Payment Method: <span t-field="o.payment_method_id.name">Credit card</span>
+                            Método de Pago: <span t-field="o.payment_method_id.name">Credit card</span>
                         </div>
                     </div>
                     <div class="oe_structure"></div>
                     <div class="row">
                         <div class="col-6" t-if="o.amount">
-                            Payment Amount: <span t-field="o.amount" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}">50 USD</span>
+                            Monto Pagado: <span t-field="o.amount" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}">50 USD</span>
                          </div>
                         <div class="col-6" t-if="o.memo">
-                            Memo: <span t-field="o.memo">Sample Memo</span>
+                            Concepto: <span t-field="o.memo">Sample Memo</span>
                          </div>
                     </div>
                 </div>
@@ -51,12 +54,12 @@
                     </t>
                     <thead>
                         <tr>
-                            <th><span>Invoice Date</span></th>
-                            <th><span>Invoice Number</span></th>
-                            <th><span>Reference</span></th>
+                            <th><span>Fecha de Factura</span></th>
+                            <th><span>Número de Factura</span></th>
+                            <th><span>Referencia</span></th>
                             <!-- Add a column if there are different currencies -->
-                            <th t-if="otherCurrency" class="text-end"><span>Amount In Currency</span></th>
-                            <th class="text-end"><span>Amount</span></th>
+                            <th t-if="otherCurrency" class="text-end"><span>Importe en Moneda</span></th>
+                            <th class="text-end"><span>Importe</span></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -87,7 +90,7 @@
                                 <!-- BALANCE -->
                                 <tr>
                                     <td/>
-                                    <td><strong>Due Amount for <span t-field="inv.name">INV001</span></strong></td>
+                                    <td><strong>Monto Adeudado para <span t-field="inv.name">INV001</span></strong></td>
                                     <td/>
                                     <td t-if="otherCurrency"/>
                                     <td class="text-end"><strong><span t-field="inv.amount_residual">25.0 USD</span></strong></td>
@@ -98,6 +101,25 @@
                 </table>
             </div>
             <div class="oe_structure"></div>
+            <!-- Pie de página personalizado con Firmas y Paginación -->
+            <div class="footer" style="font-size: 13px;">
+                <div class="row text-center mb-4">
+                    <div class="col-6">
+                        <div style="border-top: 1px solid black; width: 60%; margin: 0 auto;"/>
+                        <strong>ELABORADO POR</strong>
+                    </div>
+                    <div class="col-6">
+                        <div style="border-top: 1px solid black; width: 60%; margin: 0 auto;"/>
+                        <strong>RECIBIDO POR</strong>
+                    </div>
+                </div>
+                <div class="d-flex border-top pt-2">
+                    <div class="flex-grow-1 text-start me-2" t-field="o.company_id.report_footer"/>
+                    <div class="text-end text-muted text-nowrap">
+                        Página <span class="page"/> / <span class="topage"/>
+                    </div>
+                </div>
+            </div>
         </t>
     </template>
 

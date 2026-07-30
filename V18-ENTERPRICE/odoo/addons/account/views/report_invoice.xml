@@ -5,119 +5,111 @@
             <t t-call="web.external_layout">
                 <t t-set="o" t-value="o.with_context(lang=lang)" />
                 <t t-set="forced_vat" t-value="o.fiscal_position_id.foreign_vat"/> <!-- So that it appears in the footer of the report instead of the company VAT if it's set -->
-                <t t-if="o.move_type in ('in_invoice', 'in_refund')">
-                    <t t-set="address"/>
-                </t>
-                <t t-else="">
-                    <div class="row">
-                        <t t-if="o.partner_shipping_id and (o.partner_shipping_id != o.partner_id)">
-                            <div class="col-6">
-                                <t t-set="information_block">
-                                    <div groups="account.group_delivery_invoice_address" name="shipping_address_block">
-                                        <strong class="d-block mt-3">Shipping Address</strong>
-                                        <div t-field="o.partner_shipping_id" t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}'/>
-                                    </div>
-                                </t>
-                            </div>
-                            <div class="col-6" name="address_not_same_as_shipping">
-                                <t t-set="address">
-                                    <address class="mb-0" t-field="o.partner_id" t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}'/>
-                                    <div t-if="o.partner_id.vat" id="partner_vat_address_not_same_as_shipping">
-                                        <t t-if="o.company_id.account_fiscal_country_id.vat_label" t-out="o.company_id.account_fiscal_country_id.vat_label" id="inv_tax_id_label"/>
-                                        <t t-else="">Tax ID</t>: <span t-field="o.partner_id.vat"/>
-                                    </div>
-                                    <div t-if="o.partner_id.country_code == 'MA' and o.partner_id.company_registry">
-                                        ICE: <a t-field="o.partner_id.company_registry"/>
-                                    </div>
-                                </t>
-                            </div>
-                        </t>
-                        <t t-elif="o.partner_shipping_id and (o.partner_shipping_id == o.partner_id)">
-                            <div class="offset-col-6 col-6" name="address_same_as_shipping">
-                                <t t-set="address">
-                                    <address class="mb-0" t-field="o.partner_id" t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}'/>
-                                    <div t-if="o.partner_id.vat" id="partner_vat_address_same_as_shipping">
-                                        <t t-if="o.company_id.account_fiscal_country_id.vat_label" t-out="o.company_id.account_fiscal_country_id.vat_label" id="inv_tax_id_label"/>
-                                        <t t-else="">Tax ID</t>: <span t-field="o.partner_id.vat"/>
-                                    </div>
-                                    <div t-if="o.partner_id.country_code == 'MA' and o.partner_id.company_registry">
-                                        ICE: <a t-field="o.partner_id.company_registry"/>
-                                    </div>
-                                </t>
-                            </div>
-                        </t>
-                        <t t-else="">
-                            <div class="offset-col-6 col-6" name="no_shipping">
-                                <t t-set="address">
-                                    <address class="mb-0" t-field="o.partner_id" t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}'/>
-                                    <div t-if="o.partner_id.vat" id="partner_vat_no_shipping">
-                                        <t t-if="o.company_id.account_fiscal_country_id.vat_label" t-out="o.company_id.account_fiscal_country_id.vat_label" id="inv_tax_id_label"/>
-                                        <t t-else="">Tax ID</t>: <span t-field="o.partner_id.vat"/>
-                                    </div>
-                                    <div t-if="o.partner_id.country_code == 'MA' and o.partner_id.company_registry">
-                                        ICE: <a t-field="o.partner_id.company_registry"/>
-                                    </div>
-                                </t>
-                            </div>
-                        </t>
-                    </div>
-                </t>
-                <div class="clearfix invoice_main">
-                    <div class="page mb-4">
-                        <t t-set="layout_document_title">
-                            <t t-if="o.move_type in ('in_invoice', 'in_refund')">
-                                <!-- Título Traducido -->
-                                <h2 class="mt-3 mb-4">
-                                    <t t-if="proforma"><span>PROFORMA </span></t>
-                                    <t t-if="o.move_type == 'in_invoice'">
-                                        <t t-if="o.state == 'draft'"><span>Borrador de factura de proveedor</span></t>
-                                        <t t-if="o.state == 'cancel'"><span>Factura de proveedor cancelada</span></t>
-                                        <t t-if="o.state not in ('draft', 'cancel')"><span>Factura de proveedor</span></t>
-                                    </t>
-                                    <t t-if="o.move_type == 'in_refund'">
-                                        <t t-if="o.state == 'draft'"><span>Borrador de nota de crédito de proveedor</span></t>
-                                        <t t-if="o.state == 'cancel'"><span>Nota de crédito de proveedor cancelada</span></t>
-                                        <t t-if="o.state not in ('draft', 'cancel')"><span>Nota de crédito de proveedor</span></t>
-                                    </t>
-                                </h2>
+        <t t-set="address"/>
+        <t t-set="information_block"/>
+        <div class="clearfix invoice_main">
+            <div class="page mb-4">
+                <t t-set="layout_document_title">
+                    <t t-if="o.move_type in ('in_invoice', 'in_refund')">
+                        <!-- Título Traducido -->
+                        <h2 class="mt-3 mb-4">
+                            <t t-if="proforma"><span>PROFORMA </span></t>
+                            <t t-if="o.move_type == 'in_invoice'">
+                                <t t-if="o.state == 'draft'"><span>Borrador de factura de proveedor</span></t>
+                                <t t-if="o.state == 'cancel'"><span>Factura de proveedor cancelada</span></t>
+                                <t t-if="o.state not in ('draft', 'cancel')"><span>Factura de proveedor</span></t>
+                            </t>
+                            <t t-if="o.move_type == 'in_refund'">
+                                <t t-if="o.state == 'draft'"><span>Borrador de nota de crédito de proveedor</span></t>
+                                <t t-if="o.state == 'cancel'"><span>Nota de crédito de proveedor cancelada</span></t>
+                                <t t-if="o.state not in ('draft', 'cancel')"><span>Nota de crédito de proveedor</span></t>
+                            </t>
+                            <span t-if="o.name and o.name != '/'" t-field="o.name"/>
+                        </h2>
 
-                                <!-- Cuadro Superior con Dirección de Envío/Proveedor -->
-                                <div class="row mb-4 mt-3" style="font-size: 13px;">
-                                    <!-- Columna Izquierda: Empresa y Datos de Envío -->
-                                    <div class="col-6 text-start">
-                                        <strong>RIF de la Empresa:</strong> <span t-field="o.company_id.vat"/><br/>
-                                        <strong>Nombre de la Tienda:</strong> <span t-field="o.company_id.name"/><br/>
-                                        
-                                        <!-- Dirección de envío y teléfono -->
-                                        <div class="mt-2 text-start">
-                                            <strong>Dirección:</strong><br/>
-                                            <span t-field="o.company_id.partner_id" t-options='{"widget": "contact", "fields": ["address", "phone"], "no_marker": True}'/>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Columna Derecha: Proveedor -->
-                                    <div class="col-6 text-end">
-                                        <strong>Proveedor:</strong> <span t-field="o.partner_id.name"/><br/>
-                                        <strong>RIF Proveedor:</strong> <span t-field="o.partner_id.vat"/><br/>
-                                        <strong>Teléfono:</strong> <span t-field="o.partner_id.phone"/><br/>
-                                        <strong>Dirección:</strong> <span t-field="o.partner_id" t-options='{"widget": "contact", "fields": ["address"], "no_marker": True}'/>
-                                    </div>
+                        <!-- Cuadro Superior con Dirección de Envío/Proveedor -->
+                        <div class="row mb-4 mt-3" style="font-size: 13px;">
+                            <!-- Columna Izquierda: Empresa y Datos de Envío -->
+                            <div class="col-6 text-start">
+                                <strong>RIF de la Empresa:</strong> <span t-field="o.company_id.vat"/><br/>
+                                <strong>Nombre de la Tienda:</strong> <span t-field="o.company_id.name"/><br/>
+                                
+                                <!-- Dirección de envío y teléfono -->
+                                <div class="mt-2 text-start">
+                                    <strong>Dirección:</strong><br/>
+                                    <span t-field="o.company_id.partner_id" t-options='{"widget": "contact", "fields": ["address", "phone"], "no_marker": True}'/>
                                 </div>
+                            </div>
+                            
+                            <!-- Columna Derecha: Proveedor -->
+                            <div class="col-6 text-end">
+                                <strong>Proveedor:</strong> <span t-field="o.partner_id.name"/><br/>
+                                <strong>RIF Proveedor:</strong> <span t-field="o.partner_id.vat"/><br/>
+                                <strong>Teléfono:</strong> <span t-field="o.partner_id.phone"/><br/>
+                                <strong>Dirección:</strong> <span t-field="o.partner_id" t-options='{"widget": "contact", "fields": ["address"], "no_marker": True}'/>
+                            </div>
+                        </div>
+                    </t>
+                    <t t-else="">
+                        <!-- Título Traducido -->
+                        <h2 class="mt-3 mb-4">
+                            <t t-if="proforma"><span>FACTURA PROFORMA </span></t>
+                            <t t-elif="o.move_type == 'out_invoice'">
+                                <t t-if="o.state == 'draft'"><span>Borrador de Factura</span></t>
+                                <t t-if="o.state == 'cancel'"><span>Factura Cancelada</span></t>
+                                <t t-if="o.state not in ('draft', 'cancel')"><span>Factura de Venta</span></t>
                             </t>
-                            <t t-else="">
-                                <span t-if="not proforma"></span>
-                                <span t-else="">PROFORMA</span>
-                                <span t-if="o.move_type == 'out_invoice' and o.state == 'posted'">Invoice</span>
-                                <span t-elif="o.move_type == 'out_invoice' and o.state == 'draft'">Draft Invoice</span>
-                                <span t-elif="o.move_type == 'out_invoice' and o.state == 'cancel'">Cancelled Invoice</span>
-                                <span t-elif="o.move_type == 'out_refund' and o.state == 'posted'">Credit Note</span>
-                                <span t-elif="o.move_type == 'out_refund' and o.state == 'draft'">Draft Credit Note</span>
-                                <span t-elif="o.move_type == 'out_refund' and o.state == 'cancel'">Cancelled Credit Note</span>
-                                <span t-elif="o.move_type == 'in_refund'">Vendor Credit Note</span>
-                                <span t-elif="o.move_type == 'in_invoice'">Vendor Bill</span>
-                                <span t-if="o.name and o.name != '/'" t-field="o.name">INV/2023/0001</span>
+                            <t t-elif="o.move_type == 'out_refund'">
+                                <t t-if="o.state == 'draft'"><span>Borrador de Nota de Crédito</span></t>
+                                <t t-if="o.state == 'cancel'"><span>Nota de Crédito Cancelada</span></t>
+                                <t t-if="o.state not in ('draft', 'cancel')"><span>Nota de Crédito</span></t>
                             </t>
-                        </t>
+                            <span t-if="o.name and o.name != '/'" t-field="o.name"/>
+                        </h2>
+
+                        <!-- Cuadro Superior con Dirección y Datos de la Factura -->
+                        <div class="row mb-4 mt-3" style="font-size: 13px;">
+                            <!-- Columna Izquierda: Nuestra Empresa -->
+                            <div class="col-6 text-start">
+                                <strong>RIF de la Empresa:</strong> <span t-field="o.company_id.vat"/><br/>
+                                <strong>Nombre de la Empresa:</strong> <span t-field="o.company_id.name"/><br/>
+                                <strong>Fecha de Emisión:</strong>
+                                <span t-field="o.invoice_date" t-options='{"widget": "date"}'/><br/>
+                                <t t-if="o.invoice_date_due">
+                                    <strong>Vencimiento:</strong> <span t-field="o.invoice_date_due" t-options='{"widget": "date"}'/><br/>
+                                </t>
+                                <t t-if="o.l10n_ve_control_number">
+                                    <strong>Nro. Control:</strong> <span t-field="o.l10n_ve_control_number"/><br/>
+                                </t>
+                                <t t-if="o.invoice_user_id">
+                                    <strong>Vendedor:</strong> <span t-field="o.invoice_user_id.name"/><br/>
+                                </t>
+                            </div>
+                            
+                            <!-- Columna Derecha: Datos del Cliente -->
+                            <div class="col-6 text-end">
+                                <strong>Cliente:</strong> <span t-field="o.partner_id.name"/><br/>
+                                <strong>RIF / CI:</strong> <span t-field="o.partner_id.vat"/><br/>
+                                <t t-if="o.partner_id.phone">
+                                    <strong>Teléfono:</strong> <span t-field="o.partner_id.phone"/><br/>
+                                </t>
+                                
+                                <!-- Direcciones de Facturación y Envío -->
+                                <div class="mt-2 text-end">
+                                    <strong>Dirección de Facturación:</strong><br/>
+                                    <span t-field="o.partner_id" t-options='{"widget": "contact", "fields": ["address"], "no_marker": True}'/>
+                                    
+                                    <t t-if="o.partner_shipping_id and o.partner_shipping_id != o.partner_id">
+                                        <div class="mt-2">
+                                            <strong>Dirección de Envío:</strong><br/>
+                                            <span t-field="o.partner_shipping_id" t-options='{"widget": "contact", "fields": ["address"], "no_marker": True}'/>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </t>
                         <div class="oe_structure"></div>
                         <t t-if="o.move_type in ('in_invoice', 'in_refund')">
                             <div id="informations" class="row mb-4" style="font-size: 13px;">
@@ -145,43 +137,16 @@
                             </div>
                         </t>
                         <t t-else="">
-                            <div
-                                id="informations" class="row mb-4"
-                                t-if="o.invoice_date or (o.invoice_date_due and o.move_type == 'out_invoice' and o.state == 'posted') or o.delivery_date or o.invoice_origin or o.partner_id.ref or o.ref or o.invoice_incoterm_id">
-                                <div class="col" t-if="o.invoice_date" name="invoice_date">
-                                    <t t-if="o.move_type == 'out_invoice'"><strong>Invoice Date</strong></t>
-                                    <t t-elif="o.move_type == 'out_refund'"><strong>Credit Note Date</strong></t>
-                                    <t t-elif="o.move_type == 'out_receipt'"><strong>Receipt Date</strong></t>
-                                    <t t-else=""><strong>Date</strong></t>
-                                    <div t-field="o.invoice_date">2023-09-12</div>
-                                </div>
-                                <div class="col" t-if="o.invoice_date_due and o.move_type == 'out_invoice' and o.state == 'posted'" name="due_date">
-                                    <strong>Due Date</strong>
-                                    <div t-field="o.invoice_date_due">2023-10-31</div>
-                                </div>
-                                <div class="col" t-if="o.delivery_date" name="delivery_date">
-                                    <strong>Delivery Date</strong>
-                                    <div t-field="o.delivery_date">2023-09-25</div>
-                                </div>
-                                <div class="col" t-if="o.invoice_origin" name="origin">
-                                    <strong>Source</strong>
-                                    <div t-field="o.invoice_origin">SO123</div>
-                                </div>
-                                <div class="col" t-if="o.partner_id.ref" name="customer_code">
-                                    <strong>Customer Code</strong>
-                                    <div t-field="o.partner_id.ref"/>
-                                </div>
-                                <div class="col" t-if="o.ref" name="reference">
-                                    <strong>Reference</strong>
-                                    <div t-field="o.ref">INV/2023/00001</div>
-                                </div>
-                                <div class="col" t-if="o.invoice_incoterm_id" name="incoterm_id">
-                                    <strong>Incoterm</strong>
-                                    <div t-if="o.incoterm_location">
-                                        <span t-field="o.invoice_incoterm_id.code"/> <br/>
-                                        <span t-field="o.incoterm_location"/>
-                                    </div>
-                                    <div t-else="" t-field="o.invoice_incoterm_id.code" class="m-0"/>
+                            <!-- CONTENEDOR PARA SATISFACER XPATHS DE MÓDULOS HEREDADOS (Evita que falle la actualización de Odoo) -->
+                            <div style="display: none !important;">
+                                <div id="informations" class="row mb-4">
+                                    <div t-if="o.invoice_date" name="invoice_date"/>
+                                    <div t-if="o.invoice_date_due" name="due_date"/>
+                                    <div t-if="o.delivery_date" name="delivery_date"/>
+                                    <div t-if="o.invoice_origin" name="origin"/>
+                                    <div t-if="o.partner_id.ref" name="customer_code"/>
+                                    <div t-if="o.ref" name="reference"/>
+                                    <div t-if="o.invoice_incoterm_id" name="incoterm_id"/>
                                 </div>
                             </div>
                         </t>
@@ -272,16 +237,13 @@
                             <table class="o_has_total_table table o_main_table table-borderless mb-0" name="invoice_line_table">
                                 <thead t-attf-style="#{has_long_desc and 'display: table-row-group;' or ''}">
                                     <tr>
-                                        <th name="th_description" class="text-start"><span>Description</span></th>
-                                        <th name="th_quantity" class="text-end"><span>Quantity</span></th>
-                                        <th name="th_priceunit" t-attf-class="text-end text-nowrap {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}"><span>Unit Price</span></th>
-                                        <th name="th_discount" t-if="display_discount" t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
-                                            <span>Disc.%</span>
-                                        </th>
-                                        <th name="th_taxes" t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}"><span>Taxes</span></th>
-                                        <th name="th_subtotal" class="text-end">
-                                            <span>Amount</span>
-                                        </th>
+                                        <th name="th_code" class="text-start"><strong>Código</strong></th>
+                                        <th name="th_description" class="text-start"><strong>Descripción</strong></th>
+                                        <th name="th_quantity" class="text-end"><strong>Cantidad</strong></th>
+                                        <th name="th_priceunit" class="text-end"><strong>Precio unitario</strong></th>
+                                        <th name="th_discount" t-if="display_discount" class="text-end"><strong>Desc.</strong></th>
+                                        <th name="th_taxes" class="text-end"><strong>Impuestos</strong></th>
+                                        <th name="th_subtotal" class="text-end"><strong>Importe</strong></th>
                                     </tr>
                                 </thead>
                                 <tbody class="invoice_tbody">
@@ -295,25 +257,31 @@
 
                                         <tr t-att-class="'fw-bold o_line_section' if line.display_type == 'line_section' else 'fst-italic o_line_note' if line.display_type == 'line_note' else ''">
                                             <t t-if="line.display_type == 'product'" name="account_invoice_line_accountable">
+                                                <td>
+                                                    <span t-field="line.product_id.default_code"/>
+                                                </td>
                                                 <td name="account_invoice_line_name">
-                                                    <span t-if="line.name" t-field="line.name" t-options="{'widget': 'text'}">Bacon Burger</span>
+                                                    <span t-field="line.product_id.name"/>
+                                                    <p t-if="line.name and line.name != line.product_id.name and line.name != line.product_id.display_name">
+                                                        <span t-field="line.name" t-options="{'widget': 'text'}"/>
+                                                    </p>
                                                 </td>
                                                 <td name="td_quantity" class="o_td_quantity text-end">
-                                                    <span t-field="line.quantity" class="text-nowrap">3.00</span>
-                                                    <span t-field="line.product_uom_id"  groups="uom.group_uom">units</span>
+                                                    <span t-field="line.quantity" class="text-nowrap"/>
+                                                    <span t-field="line.product_uom_id"  groups="uom.group_uom"/>
                                                 </td>
-                                                <td name="td_price_unit" t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
-                                                    <span class="text-nowrap" t-field="line.price_unit">9.00</span>
+                                                <td name="td_price_unit" class="text-end">
+                                                    <span class="text-nowrap" t-field="line.price_unit"/>
                                                 </td>
-                                                <td name="td_discount" t-if="display_discount" t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
-                                                    <span class="text-nowrap" t-field="line.discount">0</span>
+                                                <td name="td_discount" t-if="display_discount" class="text-end">
+                                                    <span class="text-nowrap" t-field="line.discount"/>%
                                                 </td>
                                                 <t t-set="taxes" t-value="', '.join([(tax.invoice_label or tax.name) for tax in line.tax_ids])"/>
-                                                <td name="td_taxes" t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }} {{ 'text-nowrap' if len(taxes) &lt; 10 else '' }}">
-                                                    <span t-out="taxes" id="line_tax_ids">Tax 15%</span>
+                                                <td name="td_taxes" class="text-end">
+                                                    <span t-out="taxes" id="line_tax_ids"/>
                                                 </td>
                                                 <td name="td_subtotal" class="text-end o_price_total">
-                                                    <span class="text-nowrap" t-field="line.price_subtotal">27.00</span>
+                                                    <span class="text-nowrap" t-field="line.price_subtotal"/>
                                                 </td>
                                             </t>
                                             <t t-elif="line.display_type == 'line_section'">
@@ -346,23 +314,56 @@
                             </table>
                         </t>
                         <div class="overflow-hidden">
-                            <div id="right-elements" t-attf-class="#{'col-5 mt-5' if report_type == 'pdf' else 'col-12 col-md-5'} ms-5 d-inline-block float-end">
-                                <div id="total" class="clearfix row">
+                            <div id="right-elements" t-attf-class="#{'col-5 mt-3' if report_type == 'pdf' else 'col-12 col-md-5'} ms-auto d-inline-block float-end">
+                                <div id="total" class="row mt-2" name="total">
                                     <div class="ms-auto">
-                                        <table class="o_total_table table table-borderless avoid-page-break-inside">
-
-                                            <!-- Tax totals summary (invoice currency) -->
-                                            <t t-if="o.tax_totals" t-call="account.document_tax_totals">
-                                                <t t-set="tax_totals" t-value="o.tax_totals"/>
-                                                <t t-set="currency" t-value="o.currency_id"/>
+                                        <table class="o_total_table table table-sm table-borderless" style="font-size: 13px; margin-top: 10px; margin-bottom: 0px;">
+                                            <!-- Calcular Exento y Base Imponible -->
+                                            <t t-set="exempt_amount" t-value="0.0"/>
+                                            <t t-set="taxable_amount" t-value="0.0"/>
+                                            <t t-foreach="o.invoice_line_ids" t-as="line">
+                                                <t t-if="line.display_type == 'product'">
+                                                    <t t-set="has_tax" t-value="any(t.amount != 0 for t in line.tax_ids)"/>
+                                                    <t t-if="not line.tax_ids or not has_tax">
+                                                        <t t-set="exempt_amount" t-value="exempt_amount + line.price_subtotal"/>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <t t-set="taxable_amount" t-value="taxable_amount + line.price_subtotal"/>
+                                                    </t>
+                                                </t>
                                             </t>
-
-                                            <!--Payments-->
+                                            
+                                            <tr style="color: #666; border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;">
+                                                <td>Exento</td>
+                                                <td class="text-end">
+                                                    <span t-out="exempt_amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                </td>
+                                            </tr>
+                                            <tr style="color: #666; border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;">
+                                                <td>Base Imponible</td>
+                                                <td class="text-end">
+                                                    <span t-out="taxable_amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                </td>
+                                            </tr>
+                                            <tr style="color: #666; border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;">
+                                                <td>Impuestos</td>
+                                                <td class="text-end">
+                                                    <span t-out="o.amount_tax" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                </td>
+                                            </tr>
+                                            <tr style="font-size: 15px; color: #212529; border-bottom: 1px solid rgba(0, 0, 0, 0.15) !important;">
+                                                <td><strong>Total</strong></td>
+                                                <td class="text-end">
+                                                    <strong t-out="o.amount_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                </td>
+                                            </tr>
+                                            
+                                            <!-- Payments / residual amount (if print_with_payments is set) -->
                                             <t t-if="print_with_payments">
                                                 <t t-if="o.payment_state != 'invoicing_legacy'">
                                                     <t t-set="payments_vals" t-value="o.sudo().invoice_payments_widget and o.sudo().invoice_payments_widget['content'] or []"/>
                                                     <t t-foreach="payments_vals" t-as="payment_vals">
-                                                        <tr t-if="payment_vals['is_exchange'] == 0">
+                                                        <tr t-if="payment_vals['is_exchange'] == 0" style="color: #666; border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;">
                                                             <td>
                                                                 <i class="oe_form_field text-end oe_payment_label">
                                                                     <t t-if="o.move_type in ('in_invoice', 'in_refund')">
@@ -370,8 +371,8 @@
                                                                         <t t-else="">Pagado el </t>
                                                                     </t>
                                                                     <t t-else="">
-                                                                        <t t-if="payment_vals['is_refund']">Reversed on </t>
-                                                                        <t t-else="">Paid on </t>
+                                                                        <t t-if="payment_vals['is_refund']">Reversado el </t>
+                                                                        <t t-else="">Pagado el </t>
                                                                     </t>
                                                                     <t t-out="payment_vals['date']" t-options='{"widget": "date"}'>2021-09-19</t>
                                                                 </i>
@@ -382,13 +383,12 @@
                                                         </tr>
                                                     </t>
                                                     <t t-if="len(payments_vals) > 0">
-                                                        <tr class="fw-bold">
+                                                        <tr style="font-size: 14px; color: #212529; border-bottom: 1px solid rgba(0, 0, 0, 0.15) !important;">
                                                             <td>
-                                                                <t t-if="o.move_type in ('in_invoice', 'in_refund')">Cantidad por pagar</t>
-                                                                <t t-else="">Amount Due</t>
+                                                                <strong>Monto a Pagar</strong>
                                                             </td>
                                                             <td class="text-end">
-                                                                <span t-field="o.amount_residual">11.05</span>
+                                                                <strong t-field="o.amount_residual">11.05</strong>
                                                             </td>
                                                         </tr>
                                                     </t>
@@ -489,6 +489,26 @@
                     </div>
                 </div>
             </t>
+            
+            <!-- Pie de página personalizado con Firmas y Paginación -->
+            <div class="footer" style="font-size: 13px;">
+                <div class="row text-center mb-4">
+                    <div class="col-6">
+                        <div style="border-top: 1px solid black; width: 60%; margin: 0 auto;"/>
+                        <strong>ELABORADO POR</strong>
+                    </div>
+                    <div class="col-6">
+                        <div style="border-top: 1px solid black; width: 60%; margin: 0 auto;"/>
+                        <strong>RECIBIDO POR</strong>
+                    </div>
+                </div>
+                <div class="d-flex border-top pt-2">
+                    <div class="flex-grow-1 text-start me-2" t-field="o.company_id.report_footer"/>
+                    <div class="text-end text-muted text-nowrap">
+                        Página <span class="page"/> / <span class="topage"/>
+                    </div>
+                </div>
+            </div>
         </template>
 
         <template id="document_tax_totals_template">

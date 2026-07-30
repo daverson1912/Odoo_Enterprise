@@ -4,27 +4,43 @@
 <template id="report_purchaserequisition_document">
     <t t-set="o" t-value="o.with_context(lang=o.vendor_id.lang)"/>
     <t t-call="web.external_layout">
-        <t t-set="address">
-            <span t-field="o.vendor_id" t-options='{"widget": "contact", "fields": ["name","address"], "no_marker": True}'/>
-            <br/>
-            <span t-field="o.vendor_id" t-options='{"widget": "contact", "fields": ["phone"], "phone_icons": True}'/>
-            <p t-if="o.vendor_id.vat"><t t-out="o.company_id.account_fiscal_country_id.vat_label or 'Tax ID'"/>: <span t-field="o.vendor_id.vat"/></p>
-        </t>
         <div class="page">
             <div class="oe_structure"/>
             <h2><span t-out="dict(o._fields['requisition_type'].selection).get(o.requisition_type)">Purchase Agreement:</span> <span t-field="o.name">BO00004</span></h2>
-            <div class="row my-2">
-                <div t-if="o.date_end" class="col-3">
-                    <strong t-if="o.requisition_type == 'blanket_order'">Agreement Validity:</strong><br/>
-                    <span t-if="o.requisition_type == 'blanket_order'" t-field="o.date_end">2023-09-15</span>
+            
+            <div class="row my-4">
+                <div class="col-6">
+                    <t t-if="o.vendor_id">
+                        <strong>Proveedor:</strong>
+                        <div class="mt-1">
+                            <span t-field="o.vendor_id" t-options='{"widget": "contact", "fields": ["name","address"], "no_marker": True}'/>
+                        </div>
+                        <div><strong>Nro. Tlf:</strong> <span t-field="o.vendor_id.phone"/></div>
+                        <div t-if="o.vendor_id.vat"><strong>RIF:</strong> <span t-field="o.vendor_id.vat"/></div>
+                    </t>
+                    <t t-else="">
+                        <strong>Proveedor:</strong> A definir
+                    </t>
                 </div>
-                <div t-if="o.user_id" class="col-3">
-                    <strong>Contact:</strong><br/>
-                    <span t-field="o.user_id.name">Mitchell Admin</span>
+                <div class="col-3">
+                    <div class="mb-3">
+                        <strong>RIF DE LA EMPRESA:</strong><br/>
+                        <span t-field="o.company_id.vat"/>
+                    </div>
+                    <div t-if="o.user_id" class="mb-3">
+                        <strong>Contacto:</strong><br/>
+                        <span t-field="o.user_id.name">Mitchell Admin</span>
+                    </div>
                 </div>
-                <div t-if="o.reference" class="col-3">
-                    <strong>Reference:</strong><br/>
-                    <span t-field="o.reference">Demo Reference</span>
+                <div class="col-3">
+                    <div t-if="o.date_end" class="mb-3">
+                        <strong t-if="o.requisition_type == 'blanket_order'">Fecha de Vencimiento:</strong><br/>
+                        <span t-if="o.requisition_type == 'blanket_order'" t-field="o.date_end">2023-09-15</span>
+                    </div>
+                    <div t-if="o.reference" class="mb-3">
+                        <strong>Referencia:</strong><br/>
+                        <span t-field="o.reference">Demo Reference</span>
+                    </div>
                 </div>
             </div>
 
@@ -35,23 +51,24 @@
                 <t t-set="has_ordered_quantity" t-value="any(line.qty_ordered != 0 for line in o.line_ids)"/>
                     <thead>
                         <tr>
-                            <th class="text-start">Product</th>
-                            <th class="text-end">Quantity</th>
-                            <th t-if="has_ordered_quantity" class="text-end">Ordered</th>
-                            <th class="text-start" groups="uom.group_uom">Unit</th>
-                            <th class="text-end">Unit Price</th>
+                            <th class="text-start">Código del Producto</th>
+                            <th class="text-start">Producto</th>
+                            <th class="text-end">Cantidad</th>
+                            <th t-if="has_ordered_quantity" class="text-end">Ordenado</th>
+                            <th class="text-start" groups="uom.group_uom">Unidad</th>
+                            <th class="text-end">Precio Unitario</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr t-foreach="o.line_ids" t-as="line_id">
                             <td>
+                                <span t-field="line_id.product_id.default_code">Code</span>
+                            </td>
+                            <td>
                                 <t t-if="line_id.product_description_variants">
                                     <span t-field="line_id.product_description_variants"/>
                                 </t>
                                 <t t-else="">
-                                    <span t-if="line_id.product_id.code">
-                                        [ <span t-field="line_id.product_id.code">Code</span> ]
-                                    </span>
                                     <span t-field="line_id.product_id.name">Product</span>
                                 </t>
                             </td>
@@ -110,6 +127,8 @@
             </t>
 
             <div t-if="o.description" t-out="o.description"/>
+
+
 
             <div class="oe_structure"/>
         </div>
