@@ -24,3 +24,13 @@ desktop.ini
 # Odoo specific
 filestore/
 sessions/
+
+# Backups y respaldos (no versionar, demasiado pesados)
+respaldo_totalaplicaciones_prod.zip
+*.bak
+
+# Capturas del manual Odoo 18 (se comparten aparte, no se versionan)
+Manual_Odoo18_Capturas_Consolidado.zip
+Manual_Odoo18_Imagenes/
+ta_reportes_ve.zip
+photo_2026-08-11_08-59-39.jpg
